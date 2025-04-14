@@ -20,7 +20,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
-from dotenv import load_dotenv
 from github import Github, Repository
 from github.Organization import Organization
 from jinja2 import Environment, FileSystemLoader
@@ -31,11 +30,12 @@ console = Console()
 
 
 def load_github_token() -> str:
-    """Carga el token de GitHub desde las variables de entorno."""
-    load_dotenv(Path.home() / ".env")
-    token = os.getenv("GH_TOKEN")
+    """Carga el token de GitHub desde las variables de entorno de GitHub Actions."""
+    token = os.getenv("GITHUB_TOKEN")
     if not token:
-        raise ValueError("No se encontró el token de GitHub (GH_TOKEN) en ~/.env")
+        raise ValueError(
+            "No se encontró el token de GitHub (GITHUB_TOKEN) en las variables de entorno"
+        )
     return token
 
 
