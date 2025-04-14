@@ -1,12 +1,20 @@
 # 📚 Apuntes FRRE - Universidad Tecnológica Nacional
 
-¡Bienvenidos al repositorio central de apuntes y recursos educativos de la UTN-FRRE!
+¡Bienvenidos al repositorio central de apuntes y recursos educativos de la UTN-FRRE! Este es un espacio colaborativo para compartir y mantener material de estudio actualizado.
 
-## 📊 Estado Actual
+## 📊 Estado General del Repositorio
 
-- **Último update**: 2025-04-13
-- **Materias activas**: 6
-- **Año académico**: 2025
+- 📅 **Última actualización**: 2025-04-13
+- 📚 **Materias activas**: 6
+- 📆 **Año académico**: 2025
+- 📈 **Progreso general**: ██████████ 100.0%
+
+## 🎯 Objetivos del Repositorio
+
+- 📝 Mantener material de estudio actualizado y organizado
+- 🤝 Fomentar la colaboración entre estudiantes
+- 📚 Centralizar recursos educativos de calidad
+- 🔄 Facilitar el acceso a material histórico
 
 ## 📝 Repositorios de Materias
 
@@ -47,17 +55,17 @@
 
 ### 2025
 
-- [isi-arquitectura-computadoras](https://github.com/apuntes-frre/isi-arquitectura-computadoras/tree/main/notes/2025) - 
+- [isi-arquitectura-computadoras](https://github.com/apuntes-frre/isi-arquitectura-computadoras/tree/main/notes/2025) - practica, teoria
 
-- [isi-fisica-ii](https://github.com/apuntes-frre/isi-fisica-ii/tree/main/notes/2025) - 
+- [isi-fisica-ii](https://github.com/apuntes-frre/isi-fisica-ii/tree/main/notes/2025) - practica, teoria
 
-- [isi-analisis-matematico-ii](https://github.com/apuntes-frre/isi-analisis-matematico-ii/tree/main/notes/2025) - 
+- [isi-analisis-matematico-ii](https://github.com/apuntes-frre/isi-analisis-matematico-ii/tree/main/notes/2025) - practica, teoria
 
-- [isi-simulacion](https://github.com/apuntes-frre/isi-simulacion/tree/main/notes/2025) - 
+- [isi-simulacion](https://github.com/apuntes-frre/isi-simulacion/tree/main/notes/2025) - practica, teoria
 
-- [isi-investigacion-operativa](https://github.com/apuntes-frre/isi-investigacion-operativa/tree/main/notes/2025) - 
+- [isi-investigacion-operativa](https://github.com/apuntes-frre/isi-investigacion-operativa/tree/main/notes/2025) - practica, teoria
 
-- [isi-sistemas-operativos](https://github.com/apuntes-frre/isi-sistemas-operativos/tree/main/notes/2025) - 
+- [isi-sistemas-operativos](https://github.com/apuntes-frre/isi-sistemas-operativos/tree/main/notes/2025) - practica, teoria
 
 
 
@@ -69,17 +77,25 @@ Recursos compartidos entre todas las materias:
 ## 🔄 Actualizaciones Recientes
 
 
+- 2025-04-14 - isi-arquitectura-computadoras: chore: actualizar estructura del repositorio
+
 - 2025-04-14 - isi-arquitectura-computadoras: chore: inicializar estructura base del repositorio
+
+- 2025-04-14 - isi-fisica-ii: chore: actualizar estructura del repositorio
 
 - 2025-04-14 - isi-fisica-ii: chore: inicializar estructura base del repositorio
 
+- 2025-04-14 - isi-analisis-matematico-ii: chore: actualizar estructura del repositorio
+
 - 2025-04-14 - isi-analisis-matematico-ii: chore: inicializar estructura base del repositorio
+
+- 2025-04-14 - isi-simulacion: chore: actualizar estructura del repositorio
 
 - 2025-04-14 - isi-simulacion: chore: inicializar estructura base del repositorio
 
-- 2025-04-14 - isi-investigacion-operativa: chore: inicializar estructura base del repositorio
+- 2025-04-14 - isi-investigacion-operativa: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-sistemas-operativos: chore: inicializar estructura base del repositorio
+- 2025-04-14 - isi-investigacion-operativa: chore: inicializar estructura base del repositorio
 
 
 ## 📊 Progreso General
