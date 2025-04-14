@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # /// script
-# requires-python = ">=3.9"
+# requires-python = ">=3.10"
 # dependencies = [
 #   "PyGithub>=2.1.0",
 #   "jinja2>=3.0.0",
@@ -18,13 +18,19 @@ import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, TypeAlias
 
 from github import Github, Repository
 from github.Organization import Organization
 from jinja2 import Environment, FileSystemLoader
 from rich.console import Console
 from rich.progress import track
+
+# Definición de tipos específicos
+RepoInfo: TypeAlias = Dict[str, str]
+YearSubjects: TypeAlias = Dict[str, List[Dict[str, Any]]]
+UpdateInfo: TypeAlias = Dict[str, str]
+CommonResource: TypeAlias = Dict[str, str]
 
 console = Console()
 
@@ -164,12 +170,10 @@ def obtener_info_repos() -> Dict[str, Any]:
             continue
 
         # Información básica del repositorio
-        materia_name = (
-            repo.name[4:].replace("-", " ").title()
-        )  # Remover 'isi-' y formatear
+        materia_name = repo.name[4:].replace("-", " ").title()
         info_materia = {
             "name": materia_name,
-            "code": repo.name,  # Usar el nombre completo como código
+            "code": repo.name,
             "repo_url": repo.html_url,
             "description": repo.description or "",
             "last_update": repo.updated_at.strftime("%Y-%m-%d"),
@@ -180,29 +184,34 @@ def obtener_info_repos() -> Dict[str, Any]:
         try:
             contents = repo.get_contents("notes")
             for content in contents:
-                if content.type == "dir" and content.name.isdigit():
-                    año = content.name
-                    años.add(año)
-                    if año not in materias_por_año:
-                        materias_por_año[año] = []
+                match content:
+                    case _ if content.type == "dir" and content.name.isdigit():
+                        año = content.name
+                        años.add(año)
+                        if año not in materias_por_año:
+                            materias_por_año[año] = []
 
-                    # Obtener temas del año
-                    temas: List[str] = []
-                    try:
-                        contenido_año = repo.get_contents(f"notes/{año}")
-                        temas = [
-                            c.name
-                            for c in contenido_año
-                            if c.type == "dir" and not c.name == "recursos"
-                        ]
-                    except Exception as e:
-                        print(f"Error al obtener temas del año {año}: {e}")
+                        try:
+                            contenido_año = repo.get_contents(f"notes/{año}")
+                            temas = []
+                            for item in contenido_año:
+                                match item:
+                                    case _ if (
+                                        item.type == "dir" and item.name != "recursos"
+                                    ):
+                                        temas.append(item.name)
+                                    case _:
+                                        continue
 
-                    materias_por_año[año].append({
-                        "code": info_materia["code"],
-                        "year_url": f"{repo.html_url}/tree/main/notes/{año}",
-                        "latest_topics": temas[:3],  # Solo los primeros 3 temas
-                    })
+                            materias_por_año[año].append({
+                                "code": info_materia["code"],
+                                "year_url": f"{repo.html_url}/tree/main/notes/{año}",
+                                "latest_topics": temas[:3],
+                            })
+                        except Exception as e:
+                            print(f"Error al obtener temas del año {año}: {e}")
+                    case _:
+                        continue
         except Exception as e:
             print(f"Error al procesar el repositorio {repo.name}: {e}")
             continue
