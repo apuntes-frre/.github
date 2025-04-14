@@ -1,0 +1,39 @@
+name: Update Profile README
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Ejecutar todos los días a medianoche
+  workflow_dispatch: # Permite ejecutar manualmente
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: 'scripts/actualizar_readme.py'
+
+      - name: Install dependencies
+        run: uv pip install "jinja2>=3.0.0" "PyGithub>=2.1.0"
+        env:
+          UV_SYSTEM_PYTHON: 1
+
+      - name: Update README
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/actualizar_readme.py
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add profile/README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "docs: actualizar README del perfil [skip ci]"
+          git push

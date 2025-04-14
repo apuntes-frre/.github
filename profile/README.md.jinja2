@@ -1,0 +1,50 @@
+# 📚 Apuntes FRRE - Universidad Tecnológica Nacional
+
+¡Bienvenidos al repositorio central de apuntes y recursos educativos de la UTN-FRRE!
+
+## 📊 Estado Actual
+
+- **Último update**: {{ current_date }}
+- **Materias activas**: {{ active_subjects }}
+- **Año académico**: {{ current_year }}
+
+## 📝 Repositorios de Materias
+
+{% for subject in subjects %}
+### {{ subject.name }}
+- 📁 [{{ subject.code }} - {{ subject.name }}]({{ subject.repo_url }})
+- {{ subject.description }}
+- **Último material**: {{ subject.last_update }}
+{% endfor %}
+
+## 🗂 Material por Año
+
+{% for year in years %}
+### {{ year }}
+{% for subject in year_subjects[year] %}
+- [{{ subject.code }}]({{ subject.year_url }}) - {{ subject.latest_topics|join(', ') }}
+{% endfor %}
+{% endfor %}
+
+## 📌 Recursos Comunes
+
+Recursos compartidos entre todas las materias:
+{% for resource in common_resources %}
+- [{{ resource.name }}]({{ resource.url }}) - {{ resource.description }}
+{% endfor %}
+
+## 🔄 Actualizaciones Recientes
+
+{% for update in recent_updates %}
+- {{ update.date }} - {{ update.subject }}: {{ update.description }}
+{% endfor %}
+
+## 📊 Progreso General
+
+```
+{{ progress_chart }}
+```
+
+---
+> Este README se actualiza automáticamente cada día usando GitHub Actions.
+> Última actualización: {{ current_date }}
