@@ -22,15 +22,11 @@ jobs:
           enable-cache: true
           cache-dependency-glob: 'scripts/actualizar_readme.py'
 
-      - name: Install dependencies
-        run: uv pip install "jinja2>=3.0.0" "PyGithub>=2.1.0"
-        env:
-          UV_SYSTEM_PYTHON: 1
-
       - name: Update README
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python scripts/actualizar_readme.py
+          UV_SYSTEM_PYTHON: 1
+        run: uv run scripts/actualizar_readme.py
 
       - name: Commit changes
         run: |
