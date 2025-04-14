@@ -3,6 +3,8 @@ name: Update Profile README
 on:
   schedule:
     - cron: '0 0 * * *' # Ejecutar todos los días a medianoche
+    - cron: '*/5 * * * *' # Ejecutar cada 5 minutos
+
   workflow_dispatch: # Permite ejecutar manualmente
 
 jobs:

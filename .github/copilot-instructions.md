@@ -56,36 +56,75 @@ subject-repository/
 ├── README.md
 ├── notes/
 │   ├── 2019/
-│   │   ├── tema1/
-│   │   ├── tema2/
-│   │   └── recursos/
+│   │   ├── teoria/
+│   │   │   ├── tema1/
+│   │   │   ├── tema2/
+│   │   │   └── recursos/
+│   │   └── practica/
+│   │       ├── tema1/
+│   │       ├── tema2/
+│   │       └── recursos/
 │   ├── 2020/
-│   │   ├── tema1/
-│   │   ├── tema2/
-│   │   └── recursos/
+│   │   ├── teoria/
+│   │   │   ├── tema1/
+│   │   │   ├── tema2/
+│   │   │   └── recursos/
+│   │   └── practica/
+│   │       ├── tema1/
+│   │       ├── tema2/
+│   │       └── recursos/
 │   └── [año-actual]/
-│       ├── tema1/
-│       ├── tema2/
-│       └── recursos/
+│       ├── teoria/
+│       │   ├── tema1/
+│       │   ├── tema2/
+│       │   └── recursos/
+│       └── practica/
+│           ├── tema1/
+│           ├── tema2/
+│           └── recursos/
 ├── examples/
 │   ├── 2019/
+│   │   ├── teoria/
+│   │   └── practica/
 │   ├── 2020/
+│   │   ├── teoria/
+│   │   └── practica/
 │   └── [año-actual]/
+│       ├── teoria/
+│       └── practica/
 ├── study-guides/
 │   ├── 2019/
+│   │   ├── teoria/
+│   │   └── practica/
 │   ├── 2020/
+│   │   ├── teoria/
+│   │   └── practica/
 │   └── [año-actual]/
+│       ├── teoria/
+│       └── practica/
 └── resources/
     ├── common/
+    │   ├── teoria/
+    │   └── practica/
     ├── 2019/
+    │   ├── teoria/
+    │   └── practica/
     ├── 2020/
+    │   ├── teoria/
+    │   └── practica/
     └── [año-actual]/
+        ├── teoria/
+        └── practica/
 ```
 
 ## Versionado Temporal
 
 - Cada año académico debe tener su propia carpeta dentro de las secciones principales
-- La carpeta `common` en resources contiene material común a todos los años
+- Dentro de cada año, el contenido se divide en:
+  - `teoria/`: Material teórico, conceptos y explicaciones
+  - `practica/`: Ejercicios, trabajos prácticos y aplicaciones
+- La carpeta `common` en resources contiene material común a todos los años, también dividida en
+  teoría y práctica
 - El README principal debe incluir un índice al material más reciente
 - Mantener el material histórico organizado por año para referencia
 - Incluir en cada carpeta anual un README.md que describa los cambios específicos de ese año

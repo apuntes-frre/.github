@@ -4,10 +4,10 @@
 CURRENT_YEAR="2025"
 
 # Crear estructura base
-mkdir -p notes/$CURRENT_YEAR/{tema1,tema2,recursos}
-mkdir -p examples/$CURRENT_YEAR
-mkdir -p study-guides/$CURRENT_YEAR
-mkdir -p resources/{common,$CURRENT_YEAR}
+mkdir -p notes/$CURRENT_YEAR/{teoria,practica}/{tema1,tema2,recursos}
+mkdir -p examples/$CURRENT_YEAR/{teoria,practica}
+mkdir -p study-guides/$CURRENT_YEAR/{teoria,practica}
+mkdir -p resources/{common,$CURRENT_YEAR/{teoria,practica}}
 
 # Crear README base
 cat > README.md << 'END'
@@ -18,14 +18,26 @@ cat > README.md << 'END'
 
 ## 📂 Estructura del Repositorio
 
-- 📁 **notes/**: Apuntes de clase organizados por año y tema
+- 📁 **notes/**: Apuntes de clase organizados por año
+  - 📚 **teoria/**: Contenido teórico por temas
+  - 💻 **practica/**: Ejercicios y trabajos prácticos
 - 📁 **examples/**: Ejemplos prácticos y código
-- �� **study-guides/**: Guías de estudio y material de práctica
+  - 📚 **teoria/**: Ejemplos de conceptos teóricos
+  - 💻 **practica/**: Ejemplos de implementación práctica
+- 📖 **study-guides/**: Guías de estudio y material de práctica
+  - 📚 **teoria/**: Guías de estudio teóricas
+  - 💻 **practica/**: Guías de ejercicios prácticos
 - 📁 **resources/**: Recursos adicionales y material de referencia
+  - 📚 **teoria/**: Recursos para contenido teórico
+  - 💻 **practica/**: Recursos para trabajos prácticos
 
 ## 🗓️ Contenido Actual (2025)
 
-### 📚 Temas
+### 📚 Temas Teóricos
+- [Tema 1]
+- [Tema 2]
+
+### 💻 Temas Prácticos
 - [Tema 1]
 - [Tema 2]
 
@@ -46,18 +58,32 @@ END
 cat > notes/$CURRENT_YEAR/README.md << 'END'
 # 📚 Material del Año 2025
 
-## 📝 Temas Actuales
+## 📝 Contenido Actual
 
-### 📂 Tema 1
+### 📚 Teoría
+#### Tema 1
 - [Pendiente]
 
-### �� Tema 2
+#### Tema 2
+- [Pendiente]
+
+### 💻 Práctica
+#### Tema 1
+- [Pendiente]
+
+#### Tema 2
 - [Pendiente]
 
 ### 📚 Recursos
-- [Por agregar]
+- 📖 Recursos Teóricos: [Por agregar]
+- 💻 Recursos Prácticos: [Por agregar]
 
 ## 📅 Cronograma
+### Teoría
+- [ ] Tema 1
+- [ ] Tema 2
+
+### Práctica
 - [ ] Tema 1
 - [ ] Tema 2
 
