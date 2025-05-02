@@ -221,11 +221,11 @@ def obtener_info_repos() -> dict[str, Any]:
         recent_commits = list(repo.get_commits()[:3])
         if recent_commits:
             for commit in recent_commits:
-            actualizaciones_recientes.append({
-                "date": commit.commit.author.date.strftime("%Y-%m-%d"),
-                "subject": info_materia["code"],
-                "description": commit.commit.message.split("\n")[0],
-            })
+                actualizaciones_recientes.append({
+                    "date": commit.commit.author.date.strftime("%Y-%m-%d"),
+                    "subject": info_materia["code"],
+                    "description": commit.commit.message.split("\n")[0],
+                })
         else:
             console.print(
             f"No hay commits para {info_materia['code']}."
