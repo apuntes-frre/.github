@@ -140,25 +140,25 @@ Recursos compartidos entre todas las materias:
 ## 🔄 Actualizaciones Recientes
 
 
-- 2025-04-14 - isi-arquitectura-computadoras: chore: actualizar estructura del repositorio
+- 2025-04-14 02:24 - isi-algoritmos-estructuras-datos: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-arquitectura-computadoras: chore: inicializar estructura base del repositorio
+- 2025-04-14 02:24 - isi-diseno-sistemas: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-fisica-ii: chore: actualizar estructura del repositorio
+- 2025-04-14 02:24 - isi-analisis-sistemas: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-fisica-ii: chore: inicializar estructura base del repositorio
+- 2025-04-14 02:24 - isi-paradigmas-programacion: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-analisis-matematico-ii: chore: actualizar estructura del repositorio
+- 2025-04-14 02:24 - isi-sintaxis-semantica: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-analisis-matematico-ii: chore: inicializar estructura base del repositorio
+- 2025-04-14 02:24 - isi-ingenieria-calidad: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-simulacion: chore: actualizar estructura del repositorio
+- 2025-04-14 02:24 - isi-economia: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-simulacion: chore: inicializar estructura base del repositorio
+- 2025-04-14 02:24 - isi-redes-datos: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-investigacion-operativa: chore: actualizar estructura del repositorio
+- 2025-04-14 02:24 - isi-base-datos: chore: actualizar estructura del repositorio
 
-- 2025-04-14 - isi-investigacion-operativa: chore: inicializar estructura base del repositorio
+- 2025-04-14 02:18 - isi-arquitectura-computadoras: chore: actualizar estructura del repositorio
 
 
 ## 📊 Progreso General
