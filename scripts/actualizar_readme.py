@@ -217,13 +217,19 @@ def obtener_info_repos() -> dict[str, Any]:
             continue
 
         # Obtener actualizaciones recientes
-        for commit in repo.get_commits(since=datetime.now().replace(day=1))[:3]:
-            actualizaciones_recientes.append({
-                "date": commit.commit.author.date.strftime("%Y-%m-%d"),
-                "subject": info_materia["code"],
-                "description": commit.commit.message.split("\n")[0],
-            })
-
+        recent_commits = list(repo.get_commits(since=datetime.now().replace(day=1)))
+        if len(recent_commits) > 0:
+            for commit in recent_commits:
+                actualizaciones_recientes.append({
+                    "date": commit.commit.author.date.strftime("%Y-%m-%d"),
+                    "subject": info_materia["code"],
+                    "description": commit.commit.message.split("\n")[0],
+                })
+        else:
+            console.print(
+                f"No hay actualizaciones recientes para {info_materia['code']}."
+            )
+            console.print("Por favor, verifica el repositorio para más detalles.")
     # Obtener recursos comunes
     recursos_comunes: list[dict[str, str]] = []
     try:
