@@ -1,6 +1,7 @@
 name: Update Profile README
 
 on:
+  workflow_dispatch: # Permite ejecutar manualmente
   schedule:
     - cron: '0 0 * * *' # Ejecutar todos los días a medianoche
 
