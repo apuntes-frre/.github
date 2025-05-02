@@ -222,7 +222,7 @@ def obtener_info_repos() -> dict[str, Any]:
         if recent_commits:
             for commit in recent_commits:
                 actualizaciones_recientes.append({
-                    "date": commit.commit.author.date.strftime("%Y-%m-%d"),
+                    "date": commit.commit.author.date.strftime("%Y-%m-%d %H:%M"),
                     "subject": info_materia["code"],
                     "description": commit.commit.message.split("\n")[0],
                 })
