@@ -18,7 +18,7 @@ import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Set, TypeAlias
+from typing import Any, TypeAlias
 
 from github import Github, Repository
 from github.Organization import Organization
@@ -27,10 +27,10 @@ from rich.console import Console
 from rich.progress import track
 
 # Definición de tipos específicos
-RepoInfo: TypeAlias = Dict[str, str]
-YearSubjects: TypeAlias = Dict[str, List[Dict[str, Any]]]
-UpdateInfo: TypeAlias = Dict[str, str]
-CommonResource: TypeAlias = Dict[str, str]
+RepoInfo: TypeAlias = dict[str, str]
+YearSubjects: TypeAlias = dict[str, list[dict[str, Any]]]
+UpdateInfo: TypeAlias = dict[str, str]
+CommonResource: TypeAlias = dict[str, str]
 
 console = Console()
 
@@ -155,15 +155,15 @@ def has_changes(repo_path: Path) -> bool:
     return bool(result.stdout.strip())
 
 
-def obtener_info_repos() -> Dict[str, Any]:
+def obtener_info_repos() -> dict[str, Any]:
     """Obtiene información de todos los repositorios de la organización."""
     g = Github(os.getenv("GITHUB_TOKEN"))
     org: Organization = g.get_organization("apuntes-frre")
 
-    materias: List[Dict[str, str]] = []
-    años: Set[str] = set()
-    materias_por_año: Dict[str, List[Dict[str, Any]]] = {}
-    actualizaciones_recientes: List[Dict[str, str]] = []
+    materias: list[dict[str, str]] = []
+    años: set[str] = set()
+    materias_por_año: dict[str, list[dict[str, Any]]] = {}
+    actualizaciones_recientes: list[dict[str, str]] = []
 
     for repo in org.get_repos():
         if not repo.name.startswith("isi-"):
@@ -206,7 +206,7 @@ def obtener_info_repos() -> Dict[str, Any]:
                             materias_por_año[año].append({
                                 "code": info_materia["code"],
                                 "year_url": f"{repo.html_url}/tree/main/notes/{año}",
-                                "latest_topics": temas[:3],
+                                "latest_topics": temas[:3] if len(temas) > 3 else temas,
                             })
                         except Exception as e:
                             print(f"Error al obtener temas del año {año}: {e}")
@@ -225,7 +225,7 @@ def obtener_info_repos() -> Dict[str, Any]:
             })
 
     # Obtener recursos comunes
-    recursos_comunes: List[Dict[str, str]] = []
+    recursos_comunes: list[dict[str, str]] = []
     try:
         common_repo = org.get_repo("apuntes-frre")
         if common_repo:
@@ -257,7 +257,7 @@ def obtener_info_repos() -> Dict[str, Any]:
     }
 
 
-def generar_grafico_progreso(materias: List[Dict[str, str]]) -> str:
+def generar_grafico_progreso(materias: list[dict[str, str]]) -> str:
     """Genera una representación visual del progreso."""
     total = len(materias)
     actualizadas = sum(
