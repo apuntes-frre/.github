@@ -4,7 +4,7 @@
 
 ## 📊 Estado General del Repositorio
 
-- 📅 **Última actualización**: 2026-02-28
+- 📅 **Última actualización**: 2026-03-01
 - 📚 **Materias activas**: 15
 - 📆 **Año académico**: 2026
 - 📈 **Progreso general**: ░░░░░░░░░░ 0.0%
@@ -169,4 +169,4 @@ Recursos compartidos entre todas las materias:
 
 ---
 > Este README se actualiza automáticamente cada día usando GitHub Actions.
-> Última actualización: 2026-02-28
+> Última actualización: 2026-03-01
