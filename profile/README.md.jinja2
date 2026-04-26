@@ -1,58 +1,67 @@
-# 📚 Apuntes FRRE - Universidad Tecnológica Nacional
+# 📚 Apuntes FRRE — Universidad Tecnológica Nacional
 
-¡Bienvenidos al repositorio central de apuntes y recursos educativos de la UTN-FRRE! Este es un espacio colaborativo para compartir y mantener material de estudio actualizado.
+Repositorio central de apuntes y recursos educativos de la **UTN-FRRE**.
+Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
-## 📊 Estado General del Repositorio
+> 📐 Convenciones, hoja de ruta y arquitectura:
+> [`ROADMAP`](https://github.com/apuntes-frre/.github/blob/main/docs/ROADMAP.md) ·
+> [`ARCHITECTURE`](https://github.com/apuntes-frre/.github/blob/main/docs/ARCHITECTURE.md) ·
+> [`REFACTOR`](https://github.com/apuntes-frre/.github/blob/main/docs/REFACTOR.md)
 
-- 📅 **Última actualización**: {{ current_date }}
-- 📚 **Materias activas**: {{ active_subjects }}
-- 📆 **Año académico**: {{ current_year }}
-- 📈 **Progreso general**: {{ progress_chart }}
+## 📊 Estado general
 
-## 🎯 Objetivos del Repositorio
+- 📚 **Materias activas:** {{ active_subjects }}
+- 🎓 **Carreras:** {{ carreras|join(', ') }}
+- 📆 **Planes de estudio:** {{ planes|join(', ') }}
+- 📈 **Cobertura del año en curso:** {{ progress_chart }}
 
-- 📝 Mantener material de estudio actualizado y organizado
-- 🤝 Fomentar la colaboración entre estudiantes
-- 📚 Centralizar recursos educativos de calidad
-- 🔄 Facilitar el acceso a material histórico
+## 🎯 Objetivos
 
-## 📝 Repositorios de Materias
+- 📝 Mantener material de estudio actualizado y organizado.
+- 🤝 Fomentar la colaboración entre estudiantes.
+- 📚 Centralizar recursos educativos de calidad.
+- 🔄 Facilitar el acceso a material histórico.
 
-{% for subject in subjects %}
-### {{ subject.name }}
-- 📁 [{{ subject.code }} - {{ subject.name }}]({{ subject.repo_url }})
-- {{ subject.description }}
-- **Último material**: {{ subject.last_update }}
+## 📝 Repositorios por carrera y plan
+
+{% for carrera in subjects_by_carrera|sort %}
+### {{ carrera|upper }}
+{% for plan in subjects_by_carrera[carrera]|sort %}
+#### Plan {{ plan }}
+{% for subject in subjects_by_carrera[carrera][plan] %}
+- 📁 [`{{ subject.code }}`]({{ subject.repo_url }}) — **{{ subject.name }}**
+{%- if subject.description %} · {{ subject.description }}{% endif %}
+{% endfor %}
+{% endfor %}
 {% endfor %}
 
-## 🗂 Material por Año
+## 🗂 Material por año académico
 
 {% for year in years %}
 ### {{ year }}
 {% for subject in year_subjects[year] %}
-- [{{ subject.code }}]({{ subject.year_url }}) - {{ subject.latest_topics|join(', ') }}
+- [`{{ subject.code }}`]({{ subject.year_url }}){% if subject.latest_topics %} — {{ subject.latest_topics|join(', ') }}{% endif %}
 {% endfor %}
 {% endfor %}
 
-## 📌 Recursos Comunes
+{% if common_resources %}
+## 📌 Recursos comunes
 
-Recursos compartidos entre todas las materias:
 {% for resource in common_resources %}
-- [{{ resource.name }}]({{ resource.url }}) - {{ resource.description }}
+- [{{ resource.name }}]({{ resource.url }}) — {{ resource.description }}
 {% endfor %}
+{% endif %}
 
-## 🔄 Actualizaciones Recientes
+{% if recent_updates %}
+## 🔄 Actualizaciones recientes
 
 {% for update in recent_updates %}
-- {{ update.date }} - {{ update.subject }}: {{ update.description }}
+- `{{ update.date }}` · **{{ update.subject }}** — {{ update.description }}
 {% endfor %}
-
-## 📊 Progreso General
-
-```
-{{ progress_chart }}
-```
+{% endif %}
 
 ---
-> Este README se actualiza automáticamente cada día usando GitHub Actions.
-> Última actualización: {{ current_date }}
+
+> Este README se regenera automáticamente desde
+> [`apuntes-frre/.github`](https://github.com/apuntes-frre/.github).
+> Solo se commitea cuando hay cambios reales de contenido.
