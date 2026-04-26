@@ -1,0 +1,42 @@
+name: Repo Structure Sync
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'   # Día 1 de cada mes, 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Solo mostrar acciones, sin aplicar'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: 'scripts/sync_repos.py'
+
+      - name: Inspect org
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run scripts/sync_repos.py inspect
+
+      - name: Init structure on every subject repo
+        if: ${{ inputs.dry_run == false }}
+        env:
+          ORG_ADMIN_TOKEN: ${{ secrets.ORG_ADMIN_TOKEN }}
+        run: uv run scripts/sync_repos.py init-all
+
+      - name: Init structure (dry-run)
+        if: ${{ inputs.dry_run != false }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run scripts/sync_repos.py init-all --dry-run
