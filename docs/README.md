@@ -15,7 +15,7 @@ Este repositorio especial `.github` cumple varias funciones críticas para la or
 
 ## Estructura del Repositorio
 
-```
+```text
 .github/
 ├── docs/               # Documentación general de la organización
 ├── profile/           # Perfil público de la organización

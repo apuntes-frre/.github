@@ -7,7 +7,7 @@ La organización `apuntes-frre` se compone de **un repo de control** (este,
 plantillas y workflows; los repos de materia contienen únicamente apuntes,
 ejemplos, guías y recursos.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                       Organización: apuntes-frre                         │
 │                                                                          │
@@ -76,7 +76,7 @@ uv run scripts/sync_repos.py manifest diff isi --plan 2008
 
 Cada repo es **autocontenido**. La estructura objetivo es:
 
-```
+```text
 isi-2008-base-datos/
 ├── README.md                ← generado por scripts/init_repo.py
 ├── notes/
@@ -95,14 +95,14 @@ isi-2008-base-datos/
 
 ## 🏷️ Convención de nombres
 
-```
+```text
 <carrera>-<plan>-<slug>
 ```
 
-| Segmento  | Valores                          | Ejemplo                |
-| --------- | -------------------------------- | ---------------------- |
-| `carrera` | `isi`, `lic`, `tec`, …           | `isi`                  |
-| `plan`    | Año del plan de estudios UTN     | `2008`, `2023`         |
+| Segmento  | Valores                          | Ejemplo                 |
+| --------- | -------------------------------- | ----------------------- |
+| `carrera` | `isi`, `lic`, `tec`, …           | `isi`                   |
+| `plan`    | Año del plan de estudios UTN     | `2008`, `2023`          |
 | `slug`    | Nombre de la materia, kebab-case | `analisis-matematico-i` |
 
 **Reglas del slug:**
