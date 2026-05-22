@@ -51,7 +51,7 @@ The organization's main README should:
 
 Help maintain the following structure in each repository:
 
-```
+```text
 subject-repository/
 ├── README.md
 ├── notes/

@@ -1,0 +1,966 @@
+# Manifiesto de la carrera Ingeniería en Sistemas de Información (ISI)
+#
+# Universidad Tecnológica Nacional — Facultad Regional Resistencia (UTN-FRRE).
+# Single source of truth para scripts de scaffolding (init_repo.py, sync_repos.py)
+# y como referencia legible del plan curricular completo.
+#
+# Fuentes (ver data/sources/):
+#   - dc2008.pdf  — Ordenanza Nº 1150/07, Plan 2008.
+#   - dcisi.pdf   — Ordenanza Nº 1877/22, Plan 2023.
+#   - corre.pdf   — DAG de correlatividades específico de FRRE (pendiente).
+#
+# Convenciones:
+#   - Slugs en kebab-case, ASCII, todo minúsculas.
+#   - Numerales romanos en minúsculas (-i, -ii).
+#   - Las correlativas se referencian por slug, no por orden, para que el grafo
+#     sobreviva renumeraciones entre planes.
+#   - Niveles 1..5 corresponden a "Primer Nivel" .. "Quinto Nivel".
+#   - hs-semanales: horas cátedra semanales (dictado anual).
+#   - hs-totales: horas reloj totales en el año.
+#   - rtf: Reserva de Tareas para la Formación práctica (horas).
+
+# ============================================================================
+# Carrera
+# ============================================================================
+
+[carrera]
+codigo = "isi"
+nombre = "Ingeniería en Sistemas de Información"
+universidad = "Universidad Tecnológica Nacional"
+facultad = "Facultad Regional Resistencia"
+facultad-codigo = "frre"
+duracion-anios = 5
+titulo = "Ingeniero/a en Sistemas de Información"
+
+# ============================================================================
+# Plan 2008 — Ordenanza Nº 1150/07
+# ============================================================================
+
+[planes.2008]
+nombre = "Plan 2008"
+ordenanza = 1150
+ordenanza-anio = 2007
+vigencia-desde = 2008
+estado = "vigente"
+practica-supervisada-hs = 200
+fuente = "data/sources/dc2008.pdf"
+
+# -------- Primer Nivel --------
+
+[planes.2008.materias.analisis-matematico-i]
+orden = 1
+nombre = "Análisis Matemático I"
+nivel = 1
+hs-semanales = 5
+area = "Matemática"
+bloque = "Ciencias Básicas"
+integradora = false
+
+[planes.2008.materias.algebra-y-geometria-analitica]
+orden = 2
+nombre = "Álgebra y Geometría Analítica"
+nivel = 1
+hs-semanales = 5
+area = "Matemática"
+bloque = "Ciencias Básicas"
+integradora = false
+
+[planes.2008.materias.matematica-discreta]
+orden = 3
+nombre = "Matemática Discreta"
+nivel = 1
+hs-semanales = 3
+area = "Matemática"
+bloque = "Ciencias Básicas"
+integradora = false
+
+[planes.2008.materias.sistemas-y-organizaciones]
+orden = 4
+nombre = "Sistemas y Organizaciones"
+nivel = 1
+hs-semanales = 3
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+
+[planes.2008.materias.algoritmos-y-estructuras-de-datos]
+orden = 5
+nombre = "Algoritmos y Estructuras de Datos"
+nivel = 1
+hs-semanales = 5
+area = "Programación"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2008.materias.arquitectura-de-computadoras]
+orden = 6
+nombre = "Arquitectura de Computadoras"
+nivel = 1
+hs-semanales = 4
+area = "Computación"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2008.materias.fisica-i]
+orden = 7
+nombre = "Física I"
+nivel = 1
+hs-semanales = 5
+area = "Física"
+bloque = "Ciencias Básicas"
+integradora = false
+
+[planes.2008.materias.ingles-i]
+orden = 8
+nombre = "Inglés I"
+nivel = 1
+hs-semanales = 2
+area = "Idiomas"
+bloque = "Complementarias"
+integradora = false
+
+# -------- Segundo Nivel --------
+
+[planes.2008.materias.quimica]
+orden = 9
+nombre = "Química"
+nivel = 2
+hs-semanales = 3
+area = "Química"
+bloque = "Ciencias Básicas"
+integradora = false
+
+[planes.2008.materias.analisis-matematico-ii]
+orden = 10
+nombre = "Análisis Matemático II"
+nivel = 2
+hs-semanales = 5
+area = "Matemática"
+bloque = "Ciencias Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+
+[planes.2008.materias.fisica-ii]
+orden = 11
+nombre = "Física II"
+nivel = 2
+hs-semanales = 5
+area = "Física"
+bloque = "Ciencias Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-i", "fisica-i"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-aprobadas = ["analisis-matematico-i", "fisica-i"]
+
+[planes.2008.materias.analisis-de-sistemas]
+orden = 12
+nombre = "Análisis de Sistemas"
+nivel = 2
+hs-semanales = 6
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+correlativas-cursar-cursadas = ["sistemas-y-organizaciones", "algoritmos-y-estructuras-de-datos"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-aprobadas = ["sistemas-y-organizaciones", "algoritmos-y-estructuras-de-datos"]
+
+[planes.2008.materias.sintaxis-y-semantica-de-los-lenguajes]
+orden = 13
+nombre = "Sintaxis y Semántica de los Lenguajes"
+nivel = 2
+hs-semanales = 4
+area = "Programación"
+bloque = "Tecnologías Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["matematica-discreta", "algoritmos-y-estructuras-de-datos"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-aprobadas = ["matematica-discreta", "algoritmos-y-estructuras-de-datos"]
+
+[planes.2008.materias.paradigmas-de-programacion]
+orden = 14
+nombre = "Paradigmas de Programación"
+nivel = 2
+hs-semanales = 4
+area = "Programación"
+bloque = "Tecnologías Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["matematica-discreta", "algoritmos-y-estructuras-de-datos"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-aprobadas = ["matematica-discreta", "algoritmos-y-estructuras-de-datos"]
+
+[planes.2008.materias.sistemas-operativos]
+orden = 15
+nombre = "Sistemas Operativos"
+nivel = 2
+hs-semanales = 4
+area = "Computación"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+correlativas-cursar-cursadas = [
+  "matematica-discreta",
+  "algoritmos-y-estructuras-de-datos",
+  "arquitectura-de-computadoras",
+]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-aprobadas = [
+  "matematica-discreta",
+  "algoritmos-y-estructuras-de-datos",
+  "arquitectura-de-computadoras",
+]
+
+[planes.2008.materias.sistemas-de-representacion]
+orden = 16
+nombre = "Sistemas de Representación"
+nivel = 2
+hs-semanales = 3
+area = "Representación"
+bloque = "Complementarias"
+integradora = false
+
+# -------- Tercer Nivel --------
+
+[planes.2008.materias.probabilidades-y-estadisticas]
+orden = 17
+nombre = "Probabilidades y Estadísticas"
+nivel = 3
+hs-semanales = 3
+area = "Matemática"
+bloque = "Ciencias Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+
+[planes.2008.materias.diseno-de-sistemas]
+orden = 18
+nombre = "Diseño de Sistemas"
+nivel = 3
+hs-semanales = 6
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+correlativas-cursar-cursadas = ["analisis-de-sistemas", "paradigmas-de-programacion"]
+correlativas-cursar-aprobadas = [
+  "matematica-discreta",
+  "sistemas-y-organizaciones",
+  "algoritmos-y-estructuras-de-datos",
+]
+correlativas-rendir-aprobadas = ["analisis-de-sistemas", "paradigmas-de-programacion"]
+
+[planes.2008.materias.comunicaciones]
+orden = 19
+nombre = "Comunicaciones"
+nivel = 3
+hs-semanales = 4
+area = "Computación"
+bloque = "Tecnologías Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["arquitectura-de-computadoras", "analisis-matematico-ii", "fisica-ii"]
+correlativas-cursar-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica", "fisica-i"]
+correlativas-rendir-aprobadas = ["arquitectura-de-computadoras", "analisis-matematico-ii", "fisica-ii"]
+
+[planes.2008.materias.matematica-superior]
+orden = 20
+nombre = "Matemática Superior"
+nivel = 3
+hs-semanales = 4
+area = "Matemática"
+bloque = "Ciencias Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-ii"]
+correlativas-cursar-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-rendir-aprobadas = ["analisis-matematico-ii"]
+
+[planes.2008.materias.gestion-de-datos]
+orden = 21
+nombre = "Gestión de Datos"
+nivel = 3
+hs-semanales = 4
+area = "Programación"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+correlativas-cursar-cursadas = [
+  "analisis-de-sistemas",
+  "sintaxis-y-semantica-de-los-lenguajes",
+  "paradigmas-de-programacion",
+]
+correlativas-cursar-aprobadas = [
+  "matematica-discreta",
+  "sistemas-y-organizaciones",
+  "algoritmos-y-estructuras-de-datos",
+]
+correlativas-rendir-aprobadas = [
+  "analisis-de-sistemas",
+  "sintaxis-y-semantica-de-los-lenguajes",
+  "paradigmas-de-programacion",
+]
+
+[planes.2008.materias.ingenieria-y-sociedad]
+orden = 22
+nombre = "Ingeniería y Sociedad"
+nivel = 3
+hs-semanales = 2
+area = "Ciencias Sociales"
+bloque = "Complementarias"
+integradora = false
+
+[planes.2008.materias.economia]
+orden = 23
+nombre = "Economía"
+nivel = 3
+hs-semanales = 3
+area = "Ciencias Sociales"
+bloque = "Complementarias"
+integradora = false
+correlativas-cursar-cursadas = ["analisis-de-sistemas"]
+correlativas-cursar-aprobadas = ["sistemas-y-organizaciones", "algoritmos-y-estructuras-de-datos"]
+correlativas-rendir-aprobadas = ["analisis-de-sistemas"]
+
+[planes.2008.materias.ingles-ii]
+orden = 24
+nombre = "Inglés II"
+nivel = 3
+hs-semanales = 2
+area = "Idiomas"
+bloque = "Complementarias"
+integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = ["ingles-i"]
+correlativas-rendir-aprobadas = []
+
+# -------- Cuarto Nivel --------
+
+[planes.2008.materias.redes-de-informacion]
+orden = 25
+nombre = "Redes de Información"
+nivel = 4
+hs-semanales = 4
+area = "Computación"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+correlativas-cursar-cursadas = ["sistemas-operativos", "comunicaciones"]
+correlativas-cursar-aprobadas = [
+  "matematica-discreta",
+  "algoritmos-y-estructuras-de-datos",
+  "arquitectura-de-computadoras",
+  "analisis-matematico-ii",
+  "fisica-ii",
+]
+correlativas-rendir-aprobadas = ["sistemas-operativos", "comunicaciones"]
+
+[planes.2008.materias.administracion-de-recursos]
+orden = 26
+nombre = "Administración de Recursos"
+nivel = 4
+hs-semanales = 6
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+correlativas-cursar-cursadas = ["sistemas-operativos", "diseno-de-sistemas", "economia"]
+correlativas-cursar-aprobadas = [
+  "arquitectura-de-computadoras",
+  "ingles-i",
+  "analisis-de-sistemas",
+  "paradigmas-de-programacion",
+]
+correlativas-rendir-aprobadas = ["sistemas-operativos", "diseno-de-sistemas", "economia"]
+
+[planes.2008.materias.investigacion-operativa]
+orden = 27
+nombre = "Investigación Operativa"
+nivel = 4
+hs-semanales = 5
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["probabilidades-y-estadisticas", "matematica-superior"]
+correlativas-cursar-aprobadas = ["analisis-matematico-ii"]
+correlativas-rendir-aprobadas = ["probabilidades-y-estadisticas", "matematica-superior"]
+
+[planes.2008.materias.simulacion]
+orden = 28
+nombre = "Simulación"
+nivel = 4
+hs-semanales = 4
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Básicas"
+integradora = false
+correlativas-cursar-cursadas = ["probabilidades-y-estadisticas", "matematica-superior"]
+correlativas-cursar-aprobadas = ["analisis-matematico-ii"]
+correlativas-rendir-aprobadas = ["probabilidades-y-estadisticas", "matematica-superior"]
+
+[planes.2008.materias.ingenieria-de-software]
+orden = 29
+nombre = "Ingeniería de Software"
+nivel = 4
+hs-semanales = 3
+area = "Programación"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+correlativas-cursar-cursadas = [
+  "probabilidades-y-estadisticas",
+  "diseno-de-sistemas",
+  "gestion-de-datos",
+]
+correlativas-cursar-aprobadas = [
+  "analisis-de-sistemas",
+  "sintaxis-y-semantica-de-los-lenguajes",
+  "paradigmas-de-programacion",
+]
+correlativas-rendir-aprobadas = [
+  "probabilidades-y-estadisticas",
+  "diseno-de-sistemas",
+  "gestion-de-datos",
+]
+
+[planes.2008.materias.teoria-de-control]
+orden = 30
+nombre = "Teoría de Control"
+nivel = 4
+hs-semanales = 3
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+correlativas-cursar-cursadas = ["quimica", "matematica-superior"]
+correlativas-cursar-aprobadas = ["analisis-matematico-ii", "fisica-ii"]
+correlativas-rendir-aprobadas = ["quimica", "matematica-superior"]
+
+[planes.2008.materias.legislacion]
+orden = 31
+nombre = "Legislación"
+nivel = 4
+hs-semanales = 2
+area = "Ciencias Sociales"
+bloque = "Complementarias"
+integradora = false
+correlativas-cursar-cursadas = ["analisis-de-sistemas", "ingenieria-y-sociedad"]
+correlativas-cursar-aprobadas = ["sistemas-y-organizaciones", "algoritmos-y-estructuras-de-datos"]
+correlativas-rendir-aprobadas = ["analisis-de-sistemas", "ingenieria-y-sociedad"]
+
+# -------- Quinto Nivel --------
+
+[planes.2008.materias.proyecto-final]
+orden = 32
+nombre = "Proyecto Final"
+nivel = 5
+hs-semanales = 6
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+correlativas-cursar-cursadas = [
+  "redes-de-informacion",
+  "administracion-de-recursos",
+  "ingenieria-de-software",
+  "legislacion",
+]
+correlativas-cursar-aprobadas = [
+  "sistemas-operativos",
+  "sistemas-de-representacion",
+  "probabilidades-y-estadisticas",
+  "diseno-de-sistemas",
+  "comunicaciones",
+  "gestion-de-datos",
+  "ingenieria-y-sociedad",
+  "economia",
+  "ingles-ii",
+]
+# "Todas" en el plan: para rendir hay que tener aprobadas todas las restantes.
+correlativas-rendir-todas = true
+
+[planes.2008.materias.inteligencia-artificial]
+orden = 33
+nombre = "Inteligencia Artificial"
+nivel = 5
+hs-semanales = 3
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+correlativas-cursar-cursadas = ["investigacion-operativa", "simulacion"]
+correlativas-cursar-aprobadas = [
+  "probabilidades-y-estadisticas",
+  "diseno-de-sistemas",
+  "matematica-superior",
+]
+correlativas-rendir-aprobadas = ["investigacion-operativa", "simulacion"]
+
+[planes.2008.materias.administracion-gerencial]
+orden = 34
+nombre = "Administración Gerencial"
+nivel = 5
+hs-semanales = 3
+area = "Gestión Ingenieril"
+bloque = "Complementarias"
+integradora = false
+correlativas-cursar-cursadas = ["administracion-de-recursos", "investigacion-operativa"]
+correlativas-cursar-aprobadas = [
+  "sistemas-operativos",
+  "probabilidades-y-estadisticas",
+  "diseno-de-sistemas",
+  "matematica-superior",
+  "economia",
+]
+correlativas-rendir-aprobadas = ["administracion-de-recursos", "investigacion-operativa"]
+
+[planes.2008.materias.sistemas-de-gestion]
+orden = 35
+nombre = "Sistemas de Gestión"
+nivel = 5
+hs-semanales = 4
+area = "Gestión Ingenieril"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+correlativas-cursar-cursadas = [
+  "administracion-de-recursos",
+  "investigacion-operativa",
+  "simulacion",
+]
+correlativas-cursar-aprobadas = [
+  "sistemas-operativos",
+  "probabilidades-y-estadisticas",
+  "diseno-de-sistemas",
+  "matematica-superior",
+  "economia",
+]
+correlativas-rendir-aprobadas = [
+  "administracion-de-recursos",
+  "investigacion-operativa",
+  "simulacion",
+]
+
+# Electivas: definidas por la Facultad Regional. No tienen orden fijo.
+[planes.2008.electivas]
+nivel-3 = { hs-semanales = 4 }
+nivel-4 = { hs-semanales = 4 }
+nivel-5 = { hs-semanales = 14 }
+
+# ============================================================================
+# Plan 2023 — Ordenanza Nº 1877/22
+# ============================================================================
+
+[planes.2023]
+nombre = "Plan 2023"
+ordenanza = 1877
+ordenanza-anio = 2022
+vigencia-desde = 2023
+estado = "transicion"
+practica-supervisada-hs = 200
+duracion-hs-totales = 3992
+fuente = "data/sources/dcisi.pdf"
+
+# Correlativas: pendientes de definición FRRE (ver data/sources/corre.pdf
+# cuando esté disponible). Las Facultades Regionales tienen atribución para
+# definir el régimen mientras se respete el plan.
+
+# -------- Primer Nivel --------
+
+[planes.2023.materias.analisis-matematico-i]
+orden = 1
+nombre = "Análisis Matemático I"
+nivel = 1
+hs-semanales = 5
+hs-totales = 120
+rtf = 10
+area = "Matemática"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.algebra-y-geometria-analitica]
+orden = 2
+nombre = "Álgebra y Geometría Analítica"
+nivel = 1
+hs-semanales = 5
+hs-totales = 120
+rtf = 10
+area = "Matemática"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.fisica-i]
+orden = 3
+nombre = "Física I"
+nivel = 1
+hs-semanales = 5
+hs-totales = 120
+rtf = 10
+area = "Física"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.ingles-i]
+orden = 4
+nombre = "Inglés I"
+nivel = 1
+hs-semanales = 2
+hs-totales = 48
+rtf = 3
+area = "Idiomas"
+bloque = "Ciencias y Tecnologías Complementarias"
+integradora = false
+
+[planes.2023.materias.logica-y-estructuras-discretas]
+orden = 5
+nombre = "Lógica y Estructuras Discretas"
+nivel = 1
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Matemática"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.algoritmos-y-estructuras-de-datos]
+orden = 6
+nombre = "Algoritmos y Estructuras de Datos"
+nivel = 1
+hs-semanales = 5
+hs-totales = 120
+rtf = 10
+area = "Desarrollo de Software"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2023.materias.arquitectura-de-computadoras]
+orden = 7
+nombre = "Arquitectura de Computadoras"
+nivel = 1
+hs-semanales = 4
+hs-totales = 96
+rtf = 6
+area = "Computación y Comunicación de Datos"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2023.materias.sistemas-y-procesos-de-negocio]
+orden = 8
+nombre = "Sistemas y Procesos de Negocio"
+nivel = 1
+hs-semanales = 3
+hs-totales = 72
+rtf = 5
+area = "Sistemas de Información"
+bloque = "Ciencias y Tecnologías Complementarias"
+integradora = false
+
+# -------- Segundo Nivel --------
+
+[planes.2023.materias.analisis-matematico-ii]
+orden = 9
+nombre = "Análisis Matemático II"
+nivel = 2
+hs-semanales = 5
+hs-totales = 120
+rtf = 10
+area = "Matemática"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.fisica-ii]
+orden = 10
+nombre = "Física II"
+nivel = 2
+hs-semanales = 5
+hs-totales = 120
+rtf = 10
+area = "Física"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.ingenieria-y-sociedad]
+orden = 11
+nombre = "Ingeniería y Sociedad"
+nivel = 2
+hs-semanales = 2
+hs-totales = 48
+rtf = 3
+area = "Ciencias Sociales"
+bloque = "Ciencias y Tecnologías Complementarias"
+integradora = false
+
+[planes.2023.materias.ingles-ii]
+orden = 12
+nombre = "Inglés II"
+nivel = 2
+hs-semanales = 2
+hs-totales = 48
+rtf = 3
+area = "Idiomas"
+bloque = "Ciencias y Tecnologías Complementarias"
+integradora = false
+
+[planes.2023.materias.sintaxis-y-semantica-de-los-lenguajes]
+orden = 13
+nombre = "Sintaxis y Semántica de los Lenguajes"
+nivel = 2
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Desarrollo de Software"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2023.materias.paradigmas-de-programacion]
+orden = 14
+nombre = "Paradigmas de Programación"
+nivel = 2
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Desarrollo de Software"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2023.materias.sistemas-operativos]
+orden = 15
+nombre = "Sistemas Operativos"
+nivel = 2
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Computación y Comunicación de Datos"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.analisis-de-sistemas-de-informacion]
+orden = 16
+nombre = "Análisis de Sistemas de Información"
+nivel = 2
+hs-semanales = 6
+hs-totales = 144
+rtf = 10
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+
+# -------- Tercer Nivel --------
+
+[planes.2023.materias.probabilidad-y-estadistica]
+orden = 17
+nombre = "Probabilidad y Estadística"
+nivel = 3
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Matemática"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.economia]
+orden = 18
+nombre = "Economía"
+nivel = 3
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Ciencias Sociales"
+bloque = "Ciencias y Tecnologías Complementarias"
+integradora = false
+
+[planes.2023.materias.bases-de-datos]
+orden = 19
+nombre = "Bases de Datos"
+nivel = 3
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Desarrollo de Software"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.desarrollo-de-software]
+orden = 20
+nombre = "Desarrollo de Software"
+nivel = 3
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Desarrollo de Software"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.comunicacion-de-datos]
+orden = 21
+nombre = "Comunicación de Datos"
+nivel = 3
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Computación y Comunicación de Datos"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2023.materias.analisis-numerico]
+orden = 22
+nombre = "Análisis Numérico"
+nivel = 3
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Matemática"
+bloque = "Ciencias Básicas de la Ingeniería"
+integradora = false
+
+[planes.2023.materias.diseno-de-sistemas-de-informacion]
+orden = 23
+nombre = "Diseño de Sistemas de Información"
+nivel = 3
+hs-semanales = 6
+hs-totales = 144
+rtf = 10
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+
+# -------- Cuarto Nivel --------
+
+[planes.2023.materias.legislacion]
+orden = 24
+nombre = "Legislación"
+nivel = 4
+hs-semanales = 2
+hs-totales = 48
+rtf = 3
+area = "Ciencias Sociales"
+bloque = "Ciencias y Tecnologías Complementarias"
+integradora = false
+
+[planes.2023.materias.ingenieria-y-calidad-de-software]
+orden = 25
+nombre = "Ingeniería y Calidad de Software"
+nivel = 4
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Desarrollo de Software"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.redes-de-datos]
+orden = 26
+nombre = "Redes de Datos"
+nivel = 4
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Computación y Comunicación de Datos"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.investigacion-operativa]
+orden = 27
+nombre = "Investigación Operativa"
+nivel = 4
+hs-semanales = 4
+hs-totales = 96
+rtf = 6
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2023.materias.simulacion]
+orden = 28
+nombre = "Simulación"
+nivel = 4
+hs-semanales = 3
+hs-totales = 72
+rtf = 5
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Básicas"
+integradora = false
+
+[planes.2023.materias.tecnologias-para-la-automatizacion]
+orden = 29
+nombre = "Tecnologías para la Automatización"
+nivel = 4
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.administracion-de-sistemas-de-informacion]
+orden = 30
+nombre = "Administración de Sistemas de Información"
+nivel = 4
+hs-semanales = 6
+hs-totales = 144
+rtf = 10
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+
+# -------- Quinto Nivel --------
+
+[planes.2023.materias.inteligencia-artificial]
+orden = 31
+nombre = "Inteligencia Artificial"
+nivel = 5
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.ciencia-de-datos]
+orden = 32
+nombre = "Ciencia de Datos"
+nivel = 5
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Sistemas Inteligentes"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.sistemas-de-gestion]
+orden = 33
+nombre = "Sistemas de Gestión"
+nivel = 5
+hs-semanales = 4
+hs-totales = 96
+rtf = 8
+area = "Gestión Ingenieril"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.gestion-gerencial]
+orden = 34
+nombre = "Gestión Gerencial"
+nivel = 5
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Gestión Ingenieril"
+bloque = "Ciencias y Tecnologías Complementarias"
+integradora = false
+
+[planes.2023.materias.seguridad-en-los-sistemas-de-informacion]
+orden = 35
+nombre = "Seguridad en los Sistemas de Información"
+nivel = 5
+hs-semanales = 3
+hs-totales = 72
+rtf = 6
+area = "Gestión Ingenieril"
+bloque = "Tecnologías Aplicadas"
+integradora = false
+
+[planes.2023.materias.proyecto-final]
+orden = 36
+nombre = "Proyecto Final"
+nivel = 5
+hs-semanales = 6
+hs-totales = 144
+rtf = 13
+area = "Sistemas de Información"
+bloque = "Tecnologías Aplicadas"
+integradora = true
+
+# Electivas: definidas por la Facultad Regional.
+[planes.2023.electivas]
+nivel-3 = { hs-semanales = 4, hs-totales = 96, rtf = 8 }
+nivel-4 = { hs-semanales = 6, hs-totales = 144, rtf = 8 }
+nivel-5 = { hs-semanales = 10, hs-totales = 240, rtf = 13 }

@@ -7,7 +7,7 @@ La organización `apuntes-frre` se compone de **un repo de control** (este,
 plantillas y workflows; los repos de materia contienen únicamente apuntes,
 ejemplos, guías y recursos.
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                       Organización: apuntes-frre                         │
 │                                                                          │
@@ -39,15 +39,44 @@ ejemplos, guías y recursos.
 | `profile/README.md`                  | Vista pública de la organización (auto-generada).         |
 | `profile/README.md.jinja2`           | Plantilla de la vista pública.                            |
 | `docs/`                              | Documentación: roadmap, arquitectura, plan de refactor.   |
+| `data/<carrera>.toml`                | Manifest curricular (single source of truth).             |
+| `data/sources/`                      | PDFs originales del diseño curricular.                    |
 | `scripts/*.py`                       | Automatización (PEP 723, ejecutado con `uv run`).         |
 | `.github/workflows/*.yml`            | CI/CD del repo de control.                                |
 | `.github/copilot-instructions.md`    | Guías de IA para colaboradores.                           |
+
+### 1.1 Manifest curricular `data/<carrera>.toml`
+
+Es la **única fuente de verdad** para el diseño curricular de cada carrera.
+Las herramientas (`init_repo.py`, `sync_repos.py`, `actualizar_readme.py`)
+leen este archivo en lugar de inferir desde nombres de repos o descripciones.
+
+Cada manifest contiene:
+
+- Datos generales de la carrera (`[carrera]`).
+- Uno o más planes de estudios (`[planes.<año>]`) con su ordenanza y estado.
+- Cada plan declara sus materias bajo `[planes.<año>.materias.<slug>]` con
+  metadatos: `orden`, `nivel`, `hs-semanales`, `area`, `bloque`, `integradora`.
+- Las correlativas se referencian por **slug** (no por número de orden), para
+  que el grafo sobreviva renumeraciones entre planes:
+  - `correlativas-cursar-cursadas`
+  - `correlativas-cursar-aprobadas`
+  - `correlativas-rendir-aprobadas`
+  - `correlativas-rendir-todas` (booleano, para Proyecto Final)
+
+Operaciones disponibles:
+
+```sh
+uv run scripts/sync_repos.py manifest list isi --plan 2008
+uv run scripts/sync_repos.py manifest validate isi
+uv run scripts/sync_repos.py manifest diff isi --plan 2008
+```
 
 ### 2. Repos de materia `<carrera>-<plan>-<slug>`
 
 Cada repo es **autocontenido**. La estructura objetivo es:
 
-```
+```text
 isi-2008-base-datos/
 ├── README.md                ← generado por scripts/init_repo.py
 ├── notes/
@@ -66,14 +95,14 @@ isi-2008-base-datos/
 
 ## 🏷️ Convención de nombres
 
-```
+```text
 <carrera>-<plan>-<slug>
 ```
 
-| Segmento  | Valores                          | Ejemplo                |
-| --------- | -------------------------------- | ---------------------- |
-| `carrera` | `isi`, `lic`, `tec`, …           | `isi`                  |
-| `plan`    | Año del plan de estudios UTN     | `2008`, `2023`         |
+| Segmento  | Valores                          | Ejemplo                 |
+| --------- | -------------------------------- | ----------------------- |
+| `carrera` | `isi`, `lic`, `tec`, …           | `isi`                   |
+| `plan`    | Año del plan de estudios UTN     | `2008`, `2023`          |
 | `slug`    | Nombre de la materia, kebab-case | `analisis-matematico-i` |
 
 **Reglas del slug:**

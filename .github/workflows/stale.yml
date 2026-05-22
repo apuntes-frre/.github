@@ -2,7 +2,7 @@ name: Stale Issues & PRs
 
 on:
   schedule:
-    - cron: '30 5 * * *'   # Diario 05:30 UTC
+    - cron: '30 5 * * *' # Diario 05:30 UTC
   workflow_dispatch:
 
 jobs:
@@ -23,10 +23,10 @@ jobs:
           exempt-issue-labels: 'pinned,help-wanted,roadmap'
           exempt-pr-labels: 'pinned,wip'
           stale-issue-message: >
-            Este issue lleva 60 días sin actividad y se marcará como obsoleto.
-            Si sigue siendo relevante, dejá un comentario o se cerrará en 14 días.
+            Este issue lleva 60 días sin actividad y se marcará como obsoleto. Si sigue siendo
+            relevante, dejá un comentario o se cerrará en 14 días.
           stale-pr-message: >
-            Este PR lleva 30 días sin actividad. Si seguís trabajándolo, dejá un
-            comentario o se cerrará en 14 días.
+            Este PR lleva 30 días sin actividad. Si seguís trabajándolo, dejá un comentario o se
+            cerrará en 14 días.
           close-issue-message: 'Cerrado por inactividad. Reabrí cuando puedas retomarlo.'
           close-pr-message: 'Cerrado por inactividad. Reabrí cuando puedas retomarlo.'
