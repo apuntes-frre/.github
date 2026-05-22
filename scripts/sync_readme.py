@@ -179,7 +179,7 @@ def render(data: dict[str, Any]) -> str:
         lstrip_blocks=True,
         keep_trailing_newline=True,
     )
-    return env.get_template("README.md.jinja2").render(**data)
+    return env.get_template("README.md.j2").render(**data)
 
 
 def main() -> int:

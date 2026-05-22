@@ -29,8 +29,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 {% for plan in subjects_by_carrera[carrera]|sort %}
 #### Plan {{ plan }}
 {% for subject in subjects_by_carrera[carrera][plan] %}
-- 📁 [`{{ subject.code }}`]({{ subject.repo_url }}) — **{{ subject.name }}**
-{%- if subject.description %} · {{ subject.description }}{% endif %}
+- 📁 [`{{ subject.code }}`]({{ subject.repo_url }}) — **{{ subject.name }}**{{ ' · ' ~ subject.description if subject.description else '' }}
 {% endfor %}
 {% endfor %}
 {% endfor %}
@@ -40,7 +39,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 {% for year in years %}
 ### {{ year }}
 {% for subject in year_subjects[year] %}
-- [`{{ subject.code }}`]({{ subject.year_url }}){% if subject.latest_topics %} — {{ subject.latest_topics|join(', ') }}{% endif %}
+- [`{{ subject.code }}`]({{ subject.year_url }}){{ ' — ' ~ subject.latest_topics|join(', ') if subject.latest_topics else '' }}
 {% endfor %}
 {% endfor %}
 

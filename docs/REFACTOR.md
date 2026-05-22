@@ -35,7 +35,7 @@ Sin cambios destructivos. Todo lo que aterriza acá es aditivo o reemplaza
 infra que no afecta a los repos de materia.
 
 - [x] `docs/ROADMAP.md`, `docs/ARCHITECTURE.md`, `docs/REFACTOR.md`.
-- [x] Refactor de `profile/README.md.jinja2`: la fecha pasa al footer y se
+- [x] Refactor de `profile/README.md.j2`: la fecha pasa al footer y se
       escribe **solo si** otro contenido cambió, evitando diffs por fecha.
 - [x] Refactor de `scripts/sync_readme.py`: regenera el README en
       memoria, compara con el archivo, y escribe solo si difiere. La fecha
@@ -103,7 +103,7 @@ Cuando UTN publique el cambio de plan:
 1. Crear `isi-2023-<slug>` para cada materia nueva.
 2. Marcar los `isi-2008-*` como `archived: false` pero documentar fin de
    actualización en su README.
-3. Actualizar `profile/README.md.jinja2` para agrupar por plan.
+3. Actualizar `profile/README.md.j2` para agrupar por plan.
 
 ## 🧪 Verificación post-cambio
 

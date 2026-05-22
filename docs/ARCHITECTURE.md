@@ -37,7 +37,7 @@ ejemplos, guías y recursos.
 | Path                                 | Propósito                                                 |
 | ------------------------------------ | --------------------------------------------------------- |
 | `profile/README.md`                  | Vista pública de la organización (auto-generada).         |
-| `profile/README.md.jinja2`           | Plantilla de la vista pública.                            |
+| `profile/README.md.j2`           | Plantilla de la vista pública.                            |
 | `docs/`                              | Documentación: roadmap, arquitectura, plan de refactor.   |
 | `data/<carrera>.toml`                | Manifest curricular (single source of truth).             |
 | `data/sources/`                      | PDFs originales del diseño curricular.                    |
