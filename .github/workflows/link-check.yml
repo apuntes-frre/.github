@@ -1,0 +1,39 @@
+name: Link Check
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'   # Lunes 04:00 UTC
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - '**/*.md'
+      - '.github/workflows/link-check.yml'
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run lychee
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-concurrency 8
+            --exclude-mail
+            --accept 200,206,429
+            './**/*.md'
+          fail: false
+
+      - name: Create issue on failure
+        if: env.lychee_exit_code != '0' && github.event_name == 'schedule'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 'Link check failed on ${{ github.event.repository.default_branch }}'
+          content-filepath: ./lychee/out.md
+          labels: ci, links
