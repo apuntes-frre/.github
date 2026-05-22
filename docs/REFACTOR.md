@@ -9,7 +9,7 @@
 - **15 repositorios de materia**, todos prefijados `isi-` (inconsistente con
   `copilot-instructions.md`, que sugería `materia-codigo-nombre`).
 - Estructura interna profunda con `tema1/tema2` placeholders y `.gitkeep`.
-- `init-repo-structure.sh` (bash) duplica lógica de `scripts/actualizar_readme.py`
+- `init-repo-structure.sh` (bash) duplica lógica de `scripts/sync_readme.py`
   (Python).
 - Workflow `update-profile-readme.yml` corre **diariamente** y produce commits
   vacíos porque la plantilla incluye la fecha actual: cada ejecución cambia un
@@ -37,7 +37,7 @@ infra que no afecta a los repos de materia.
 - [x] `docs/ROADMAP.md`, `docs/ARCHITECTURE.md`, `docs/REFACTOR.md`.
 - [x] Refactor de `profile/README.md.jinja2`: la fecha pasa al footer y se
       escribe **solo si** otro contenido cambió, evitando diffs por fecha.
-- [x] Refactor de `scripts/actualizar_readme.py`: regenera el README en
+- [x] Refactor de `scripts/sync_readme.py`: regenera el README en
       memoria, compara con el archivo, y escribe solo si difiere. La fecha
       se calcula a partir del `mtime` del archivo si nada cambió.
 - [x] Reemplazo de `init-repo-structure.sh` por `scripts/init_repo.py`

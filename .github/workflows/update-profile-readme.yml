@@ -27,12 +27,12 @@ jobs:
         with:
           python-version: '3.12'
           enable-cache: true
-          cache-dependency-glob: 'scripts/actualizar_readme.py'
+          cache-dependency-glob: 'scripts/sync_readme.py'
 
       - name: Regenerate README
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run scripts/actualizar_readme.py
+        run: uv run scripts/sync_readme.py
 
       - name: Commit if changed
         run: |

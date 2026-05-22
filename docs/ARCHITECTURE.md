@@ -48,7 +48,7 @@ ejemplos, guías y recursos.
 ### 1.1 Manifest curricular `data/<carrera>.toml`
 
 Es la **única fuente de verdad** para el diseño curricular de cada carrera.
-Las herramientas (`init_repo.py`, `sync_repos.py`, `actualizar_readme.py`)
+Las herramientas (`init_repo.py`, `sync_repos.py`, `sync_readme.py`)
 leen este archivo en lugar de inferir desde nombres de repos o descripciones.
 
 Cada manifest contiene:
