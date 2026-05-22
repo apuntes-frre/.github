@@ -26,12 +26,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from github import Github
-from github.Organization import Organization
-from github.Repository import Repository
-from jinja2 import Environment, FileSystemLoader
-from rich.console import Console
-from rich.progress import track
+from github import Github  # ty: ignore
+from github.Organization import Organization  # ty: ignore
+from github.Repository import Repository  # ty: ignore
+from jinja2 import Environment, FileSystemLoader  # ty: ignore
+from rich.console import Console  # ty: ignore
+from rich.progress import track  # ty: ignore
 
 ORG_NAME = "apuntes-frre"
 REPO_NAME_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<plan>\d{4})-(?P<slug>[a-z0-9-]+)$")

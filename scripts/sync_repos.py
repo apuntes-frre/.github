@@ -36,11 +36,11 @@ import tomllib
 from pathlib import Path
 from typing import Annotated, Any
 
-import typer
-from github import Github
-from github.Repository import Repository
-from rich.console import Console
-from rich.table import Table
+import typer  # ty: ignore
+from github import Github  # ty: ignore
+from github.Repository import Repository  # ty: ignore
+from rich.console import Console  # ty: ignore
+from rich.table import Table  # ty: ignore
 
 ORG_NAME = "apuntes-frre"
 DEFAULT_PLAN = "2008"

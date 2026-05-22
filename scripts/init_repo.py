@@ -30,8 +30,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
-import typer
-from rich.console import Console
+import typer  # ty: ignore
+from rich.console import Console  # ty: ignore
 
 console = Console()
 app = typer.Typer(add_completion=False, no_args_is_help=True)
