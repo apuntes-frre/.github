@@ -26,12 +26,6 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 ### ISI
 #### Plan 2008
-- 📁 [`isi-fisica-ii`](https://github.com/apuntes-frre/isi-fisica-ii) — **Fisica Ii** · Física II
-- 📁 [`isi-analisis-matematico-ii`](https://github.com/apuntes-frre/isi-analisis-matematico-ii) — **Analisis Matematico Ii** · Análisis Matemático II
-- 📁 [`isi-simulacion`](https://github.com/apuntes-frre/isi-simulacion) — **Simulacion** · Simulación
-- 📁 [`isi-investigacion-operativa`](https://github.com/apuntes-frre/isi-investigacion-operativa) — **Investigacion Operativa** · Investigación Operativa
-- 📁 [`isi-sistemas-operativos`](https://github.com/apuntes-frre/isi-sistemas-operativos) — **Sistemas Operativos** · Sistemas Operativos
-- 📁 [`isi-economia`](https://github.com/apuntes-frre/isi-economia) — **Economia** · Economía
 - 📁 [`isi-2008-administracion-de-recursos`](https://github.com/apuntes-frre/isi-2008-administracion-de-recursos) — **Administracion De Recursos** · Administración de Recursos
 - 📁 [`isi-2008-administracion-gerencial`](https://github.com/apuntes-frre/isi-2008-administracion-gerencial) — **Administracion Gerencial** · Administración Gerencial
 - 📁 [`isi-2008-algebra-y-geometria-analitica`](https://github.com/apuntes-frre/isi-2008-algebra-y-geometria-analitica) — **Algebra Y Geometria Analitica** · Álgebra y Geometría Analítica
@@ -61,16 +55,15 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 - 📁 [`isi-2008-sistemas-de-representacion`](https://github.com/apuntes-frre/isi-2008-sistemas-de-representacion) — **Sistemas De Representacion** · Sistemas de Representación
 - 📁 [`isi-2008-sistemas-y-organizaciones`](https://github.com/apuntes-frre/isi-2008-sistemas-y-organizaciones) — **Sistemas Y Organizaciones** · Sistemas y Organizaciones
 - 📁 [`isi-2008-teoria-de-control`](https://github.com/apuntes-frre/isi-2008-teoria-de-control) — **Teoria De Control** · Teoría de Control
+- 📁 [`isi-2008-analisis-matematico-ii`](https://github.com/apuntes-frre/isi-2008-analisis-matematico-ii) — **Analisis Matematico Ii** · Análisis Matemático II
+- 📁 [`isi-2008-economia`](https://github.com/apuntes-frre/isi-2008-economia) — **Economia** · Economía
+- 📁 [`isi-2008-fisica-ii`](https://github.com/apuntes-frre/isi-2008-fisica-ii) — **Fisica Ii** · Física II
+- 📁 [`isi-2008-investigacion-operativa`](https://github.com/apuntes-frre/isi-2008-investigacion-operativa) — **Investigacion Operativa** · Investigación Operativa
+- 📁 [`isi-2008-simulacion`](https://github.com/apuntes-frre/isi-2008-simulacion) — **Simulacion** · Simulación
+- 📁 [`isi-2008-sistemas-operativos`](https://github.com/apuntes-frre/isi-2008-sistemas-operativos) — **Sistemas Operativos** · Sistemas Operativos
 
 ## 🗂 Material por año académico
 
-### 2025
-- [`isi-fisica-ii`](https://github.com/apuntes-frre/isi-fisica-ii/tree/main/notes/2025) — practica, teoria
-- [`isi-analisis-matematico-ii`](https://github.com/apuntes-frre/isi-analisis-matematico-ii/tree/main/notes/2025) — practica, teoria
-- [`isi-simulacion`](https://github.com/apuntes-frre/isi-simulacion/tree/main/notes/2025) — practica, teoria
-- [`isi-investigacion-operativa`](https://github.com/apuntes-frre/isi-investigacion-operativa/tree/main/notes/2025) — practica, teoria
-- [`isi-sistemas-operativos`](https://github.com/apuntes-frre/isi-sistemas-operativos/tree/main/notes/2025) — practica, teoria
-- [`isi-economia`](https://github.com/apuntes-frre/isi-economia/tree/main/notes/2025) — practica, teoria
 
 
 ## 🔄 Actualizaciones recientes
