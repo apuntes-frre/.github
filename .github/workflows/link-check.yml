@@ -2,7 +2,7 @@ name: Link Check
 
 on:
   schedule:
-    - cron: '0 4 * * 1'   # Lunes 04:00 UTC
+    - cron: '0 4 * * 1' # Lunes 04:00 UTC
   workflow_dispatch:
   pull_request:
     paths:
@@ -23,11 +23,7 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with:
           args: >-
-            --no-progress
-            --max-concurrency 8
-            --exclude-mail
-            --accept 200,206,429
-            './**/*.md'
+            --no-progress --max-concurrency 8 --exclude-mail --accept 200,206,429 './**/*.md'
           fail: false
 
       - name: Create issue on failure

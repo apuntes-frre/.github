@@ -254,6 +254,8 @@ def manifest_diff(
     org = _client().get_organization(ORG_NAME)
     actual: set[str] = set()
     for repo in org.get_repos():
+        if repo.archived:
+            continue
         cls = _classify(repo.name)
         if cls is None:
             continue
@@ -282,6 +284,8 @@ def _carrera_repos_by_name(org, carrera: str, plan: str) -> dict[str, Repository
     """Repos de la carrera presentes en la org, indexados por nombre normalizado."""
     repos: dict[str, Repository] = {}
     for repo in org.get_repos():
+        if repo.archived:
+            continue
         cls = _classify(repo.name)
         if cls is None:
             continue

@@ -87,6 +87,8 @@ def collect_org_state(org: Organization) -> dict[str, Any]:
 
     repos = list(org.get_repos())
     for repo in track(repos, description="Inspeccionando repos"):
+        if repo.archived:
+            continue
         parsed = parse_repo_name(repo.name)
         if parsed is None:
             continue
