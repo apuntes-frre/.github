@@ -1,0 +1,49 @@
+<!-- AUTOGENERADO desde apuntes-frre/.github (data/{{ carrera }}.toml).
+     No editar a mano: los cambios se sobrescriben en el próximo run de CI. -->
+# 📚 {{ nombre }}
+
+> Materia de **{{ carrera_nombre }}** — Plan {{ plan }}.
+
+## 📋 Datos
+
+- 🎯 **Nivel:** {{ nivel }}
+- 🧩 **Área:** {{ area }}
+- 🗂️ **Bloque:** {{ bloque }}
+- ⏱️ **Horas semanales:** {{ hs }}
+{% if integradora %}
+- ⭐ **Materia integradora**
+{% endif %}
+
+{% if cursar_cursadas or cursar_aprobadas or rendir_aprobadas or rendir_todas %}
+## 🔗 Correlativas
+
+{% if cursar_cursadas %}
+**Para cursar — cursadas:** {{ cursar_cursadas|join(', ') }}
+{% endif %}
+{% if cursar_aprobadas %}
+**Para cursar — aprobadas:** {{ cursar_aprobadas|join(', ') }}
+{% endif %}
+{% if rendir_aprobadas %}
+**Para rendir — aprobadas:** {{ rendir_aprobadas|join(', ') }}
+{% endif %}
+{% if rendir_todas %}
+**Para rendir:** todas las materias restantes del plan.
+{% endif %}
+{% endif %}
+
+## 📂 Estructura
+
+- `notes/<año>/teoria/` — apuntes teóricos.
+- `notes/<año>/practica/` — ejercicios y trabajos prácticos.
+- `examples/` — ejemplos de código (opcional, solo si hay contenido).
+- `study-guides/` — guías de estudio para parciales y finales.
+- `resources/common/` — bibliografía y enlaces compartidos entre años.
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas. Convenciones generales en
+[apuntes-frre/.github](https://github.com/apuntes-frre/.github).
+
+## 📜 Licencia
+
+MIT.

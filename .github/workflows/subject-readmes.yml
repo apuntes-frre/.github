@@ -1,0 +1,43 @@
+name: Subject READMEs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'templates/subject_readme.md.j2'
+      - 'scripts/sync_repos.py'
+      - '.github/workflows/subject-readmes.yml'
+  schedule:
+    - cron: '0 4 * * 1'   # Lunes 04:00 UTC (red de seguridad semanal)
+  workflow_dispatch:
+    inputs:
+      plan:
+        description: 'Plan a publicar'
+        required: false
+        default: '2008'
+
+concurrency:
+  group: subject-readmes
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: 'scripts/sync_repos.py'
+
+      - name: Publish subject READMEs
+        env:
+          ORG_ADMIN_TOKEN: ${{ secrets.ORG_ADMIN_TOKEN }}
+        run: |
+          uv run scripts/sync_repos.py readmes isi \
+            --plan "${{ github.event.inputs.plan || '2008' }}" \
+            --apply

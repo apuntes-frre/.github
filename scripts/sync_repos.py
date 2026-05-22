@@ -3,6 +3,7 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #   "PyGithub>=2.1.0",
+#   "jinja2>=3.0.0",
 #   "rich>=13.0.0",
 #   "typer>=0.12.0",
 # ]
@@ -21,8 +22,10 @@ Subcomandos:
 - `manifest diff`   → diff entre repos expected (según manifest) y la org.
 - `manifest sync`   → crea faltantes, actualiza descripciones y reporta/archiva
                       sobrantes. El manifest es la única fuente de verdad.
+- `readmes`         → genera y publica el README de cada repo de materia desde
+                      el manifest (idempotente; sobrescribe ediciones manuales).
 
-Todos los subcomandos sobre la org soportan `--dry-run`.
+Los subcomandos que escriben en la org soportan dry-run (sin --apply) o --dry-run.
 """
 
 from __future__ import annotations
@@ -39,12 +42,14 @@ from typing import Annotated, Any
 import typer  # ty: ignore
 from github import Github  # ty: ignore
 from github.Repository import Repository  # ty: ignore
+from jinja2 import Environment, FileSystemLoader  # ty: ignore
 from rich.console import Console  # ty: ignore
 from rich.table import Table  # ty: ignore
 
 ORG_NAME = "apuntes-frre"
 DEFAULT_PLAN = "2008"
 DATA_DIR = Path(__file__).parent.parent / "data"
+TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
 KNOWN_CARRERAS = {"isi", "lic", "tec"}
 
 NEW_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<plan>\d{4})-(?P<slug>[a-z0-9-]+)$")
@@ -365,6 +370,101 @@ def manifest_sync(
         for name in extra:
             existing[name].edit(archived=True)
             console.print(f"[yellow]✓ archivado {existing[name].name}[/]")
+
+
+def _render_subject_readme(
+    manifest: dict[str, Any], plan: str, slug: str
+) -> str:
+    """Renderiza el README de una materia desde el manifest."""
+    materia = manifest["planes"][plan]["materias"][slug]
+    names = {s: m["nombre"] for s, m in manifest["planes"][plan]["materias"].items()}
+    resolve = lambda keys: [names[s] for s in keys if s in names]  # noqa: E731
+
+    env = Environment(
+        loader=FileSystemLoader(TEMPLATE_DIR),
+        trim_blocks=True,
+        lstrip_blocks=True,
+        keep_trailing_newline=True,
+    )
+    return env.get_template("subject_readme.md.j2").render(
+        carrera=manifest["carrera"]["codigo"],
+        carrera_nombre=manifest["carrera"]["nombre"],
+        plan=plan,
+        nombre=materia["nombre"],
+        nivel=materia["nivel"],
+        area=materia.get("area", "—"),
+        bloque=materia.get("bloque", "—"),
+        hs=materia.get("hs-semanales", "—"),
+        integradora=materia.get("integradora", False),
+        cursar_cursadas=resolve(materia.get("correlativas-cursar-cursadas", [])),
+        cursar_aprobadas=resolve(materia.get("correlativas-cursar-aprobadas", [])),
+        rendir_aprobadas=resolve(materia.get("correlativas-rendir-aprobadas", [])),
+        rendir_todas=materia.get("correlativas-rendir-todas", False),
+    )
+
+
+@app.command()
+def readmes(
+    carrera: Annotated[str, typer.Argument()] = "isi",
+    plan: Annotated[str, typer.Option(help="Plan a publicar")] = DEFAULT_PLAN,
+    apply: Annotated[bool, typer.Option("--apply", help="Publica los READMEs")] = False,
+) -> None:
+    """Genera el README de cada repo de materia desde el manifest y lo publica.
+
+    Idempotente: solo escribe en los repos donde el contenido difiere. El manifest
+    es la única fuente de verdad; cualquier edición manual del README se sobrescribe.
+    """
+    manifest = _load_manifest(carrera)
+    if plan not in manifest["planes"]:
+        raise typer.BadParameter(
+            f"Plan '{plan}' no existe. Disponibles: {sorted(manifest['planes'])}"
+        )
+    materias = manifest["planes"][plan]["materias"]
+
+    org = _client().get_organization(ORG_NAME)
+    repos = _carrera_repos_by_name(org, carrera, plan)
+
+    changed = 0
+    for slug in materias:
+        name = f"{carrera}-{plan}-{slug}"
+        repo = repos.get(name)
+        if repo is None:
+            console.print(f"[yellow]⚠ {name}: repo ausente, omitido[/]")
+            continue
+
+        rendered = _render_subject_readme(manifest, plan, slug)
+        try:
+            current = repo.get_contents("README.md")
+            existing = current.decoded_content.decode("utf-8")
+        except Exception:
+            current = None
+            existing = None
+
+        if existing == rendered:
+            continue
+
+        changed += 1
+        console.print(f"  ~ {name}")
+        if apply:
+            if current is None:
+                repo.create_file("README.md", "docs: README autogenerado desde manifest", rendered)
+            else:
+                repo.update_file(
+                    "README.md",
+                    "docs: sincronizar README desde manifest",
+                    rendered,
+                    current.sha,
+                )
+
+    if not changed:
+        console.print("[green]✓ Todos los READMEs ya están sincronizados.[/]")
+    elif not apply:
+        console.print(
+            f"[yellow]DRY-RUN: {changed} README(s) a actualizar. "
+            f"Repetí con --apply para publicarlos.[/]"
+        )
+    else:
+        console.print(f"[green]✓ {changed} README(s) publicados.[/]")
 
 
 if __name__ == "__main__":
