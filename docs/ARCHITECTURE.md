@@ -70,7 +70,15 @@ Operaciones disponibles:
 uv run scripts/sync_repos.py manifest list isi --plan 2008
 uv run scripts/sync_repos.py manifest validate isi
 uv run scripts/sync_repos.py manifest diff isi --plan 2008
+uv run scripts/sync_repos.py manifest sync isi --plan 2008          # dry-run
+uv run scripts/sync_repos.py manifest sync isi --plan 2008 --apply  # ejecuta
 ```
+
+> **Flujo de trabajo:** el manifest es lo único que se edita. Para agregar,
+> modificar o quitar materias, editás `data/<carrera>.toml` y corrés
+> `manifest sync`. `sync` crea los repos faltantes, actualiza descripciones que
+> divergieron y reporta los sobrantes (con `--archive` los archiva). La
+> migración de archivos de repos legacy se hace manualmente.
 
 ### 2. Repos de materia `<carrera>-<plan>-<slug>`
 

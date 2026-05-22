@@ -19,6 +19,8 @@ Subcomandos:
 - `manifest list`   → lista materias declaradas en data/<carrera>.toml.
 - `manifest validate` → verifica que el DAG de correlativas no tenga huérfanas.
 - `manifest diff`   → diff entre repos expected (según manifest) y la org.
+- `manifest sync`   → crea faltantes, actualiza descripciones y reporta/archiva
+                      sobrantes. El manifest es la única fuente de verdad.
 
 Todos los subcomandos sobre la org soportan `--dry-run`.
 """
@@ -276,9 +278,9 @@ def manifest_diff(
         console.print("[green]✓ Org y manifest coinciden.[/]")
 
 
-def _existing_carrera_repos(org, carrera: str, plan: str) -> set[str]:
-    """Repos de la carrera ya presentes en la org, normalizados al plan."""
-    actual: set[str] = set()
+def _carrera_repos_by_name(org, carrera: str, plan: str) -> dict[str, Repository]:
+    """Repos de la carrera presentes en la org, indexados por nombre normalizado."""
+    repos: dict[str, Repository] = {}
     for repo in org.get_repos():
         cls = _classify(repo.name)
         if cls is None:
@@ -286,18 +288,25 @@ def _existing_carrera_repos(org, carrera: str, plan: str) -> set[str]:
         c, p, slug = cls
         if c != carrera:
             continue
-        actual.add(f"{c}-{p}-{slug}" if NEW_RE.match(repo.name) else f"{c}-{plan}-{slug}")
-    return actual
+        norm = f"{c}-{p}-{slug}" if NEW_RE.match(repo.name) else f"{c}-{plan}-{slug}"
+        repos[norm] = repo
+    return repos
 
 
-@manifest_app.command("create")
-def manifest_create(
+@manifest_app.command("sync")
+def manifest_sync(
     carrera: Annotated[str, typer.Argument()] = "isi",
-    plan: Annotated[str, typer.Option(help="Plan a poblar")] = DEFAULT_PLAN,
-    private: Annotated[bool, typer.Option(help="Crear los repos como privados")] = False,
-    apply: Annotated[bool, typer.Option("--apply", help="Crea los repos faltantes")] = False,
+    plan: Annotated[str, typer.Option(help="Plan a sincronizar")] = DEFAULT_PLAN,
+    private: Annotated[bool, typer.Option(help="Crear los repos nuevos como privados")] = False,
+    archive: Annotated[bool, typer.Option("--archive", help="Archivar repos sobrantes (en vez de solo reportarlos)")] = False,
+    apply: Annotated[bool, typer.Option("--apply", help="Aplica los cambios")] = False,
 ) -> None:
-    """Crea en la org los repos de materia faltantes según el manifest."""
+    """Sincroniza la org con el manifest: crea faltantes, actualiza descripciones
+    y reporta (o archiva) repos que ya no están en el manifest.
+
+    El manifest data/<carrera>.toml es la única fuente de verdad. Dry-run por
+    defecto; agregá --apply para ejecutar.
+    """
     manifest = _load_manifest(carrera)
     if plan not in manifest["planes"]:
         raise typer.BadParameter(
@@ -307,31 +316,51 @@ def manifest_create(
     expected = {f"{carrera}-{plan}-{slug}": m["nombre"] for slug, m in materias.items()}
 
     org = _client().get_organization(ORG_NAME)
-    existing = _existing_carrera_repos(org, carrera, plan)
+    existing = _carrera_repos_by_name(org, carrera, plan)
+
     missing = sorted(name for name in expected if name not in existing)
+    drift = sorted(
+        name for name, repo in existing.items()
+        if name in expected and (repo.description or "") != expected[name]
+    )
+    extra = sorted(name for name in existing if name not in expected)
 
-    if not missing:
-        console.print("[green]✓ La org ya tiene todos los repos del manifest.[/]")
+    if missing:
+        console.print("[green]Crear (en manifest, no en org):[/]")
+        for name in missing:
+            console.print(f"  + {name} — [dim]{expected[name]}[/]")
+    if drift:
+        console.print("[cyan]Actualizar descripción:[/]")
+        for name in drift:
+            console.print(f"  ~ {name} → [dim]{expected[name]}[/]")
+    if extra:
+        verb = "Archivar" if archive else "Sobrantes (no en manifest)"
+        console.print(f"[yellow]{verb}:[/]")
+        for name in extra:
+            console.print(f"  - {existing[name].name}")
+
+    if not (missing or drift or (extra and archive)):
+        console.print("[green]✓ Org y manifest coinciden.[/]")
         return
-
-    for name in missing:
-        console.print(f"  • {name} — [dim]{expected[name]}[/]")
 
     if not apply:
         console.print(
-            f"[yellow]DRY-RUN: {len(missing)} repo(s) a crear. "
-            f"Repetí con --apply para crearlos.[/]"
+            f"[yellow]DRY-RUN: {len(missing)} a crear, {len(drift)} a actualizar"
+            + (f", {len(extra)} a archivar" if archive else "")
+            + ". Repetí con --apply para ejecutar.[/]"
         )
         return
 
     for name in missing:
-        org.create_repo(
-            name,
-            description=expected[name],
-            private=private,
-            auto_init=True,
-        )
+        org.create_repo(name, description=expected[name], private=private, auto_init=True)
         console.print(f"[green]✓ creado {name}[/]")
+    for name in drift:
+        existing[name].edit(description=expected[name])
+        console.print(f"[cyan]✓ descripción actualizada {name}[/]")
+    if archive:
+        for name in extra:
+            existing[name].edit(archived=True)
+            console.print(f"[yellow]✓ archivado {existing[name].name}[/]")
 
 
 if __name__ == "__main__":
