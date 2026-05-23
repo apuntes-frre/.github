@@ -5,8 +5,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 > 📐 Convenciones, hoja de ruta y arquitectura:
 > [`ROADMAP`](https://github.com/apuntes-frre/.github/blob/main/docs/ROADMAP.md) ·
-> [`ARCHITECTURE`](https://github.com/apuntes-frre/.github/blob/main/docs/ARCHITECTURE.md) ·
-> [`REFACTOR`](https://github.com/apuntes-frre/.github/blob/main/docs/REFACTOR.md)
+> [`ARCHITECTURE`](https://github.com/apuntes-frre/.github/blob/main/docs/ARCHITECTURE.md)
 
 ## 📊 Estado general
 
