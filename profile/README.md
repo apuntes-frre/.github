@@ -23,7 +23,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 ## 📝 Repositorios por carrera y plan
 
-### ISI
+### ISI — Ingeniería en Sistemas de Información
 #### Plan 2008
 - 📁 [`isi-2008-administracion-de-recursos`](https://github.com/apuntes-frre/isi-2008-administracion-de-recursos) — **Administracion De Recursos** · Administración de Recursos
 - 📁 [`isi-2008-administracion-gerencial`](https://github.com/apuntes-frre/isi-2008-administracion-gerencial) — **Administracion Gerencial** · Administración Gerencial

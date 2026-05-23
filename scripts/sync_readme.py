@@ -48,6 +48,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+import tomllib
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -61,11 +62,22 @@ from rich.console import Console  # ty: ignore
 from rich.progress import track  # ty: ignore
 
 ORG_NAME = "apuntes-frre"
+DATA_DIR = Path(__file__).parent.parent / "data"
 REPO_NAME_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<plan>\d{4})-(?P<slug>[a-z0-9-]+)$")
 LEGACY_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<slug>[a-z0-9-]+)$")
 DEFAULT_PLAN = "2008"
 
 console = Console()
+
+
+def carrera_nombre(code: str) -> str:
+    """Nombre completo de la carrera desde data/<code>.toml; fallback al código."""
+    path = DATA_DIR / f"{code}.toml"
+    if path.exists():
+        with path.open("rb") as f:
+            data = tomllib.load(f)
+        return data.get("carrera", {}).get("nombre", code.upper())
+    return code.upper()
 
 
 def load_token() -> str:
@@ -168,6 +180,7 @@ def collect_org_state(org: Organization) -> dict[str, Any]:
         "recent_updates": sorted(recent, key=lambda x: x["date"], reverse=True)[:10],
         "active_subjects": len(materias),
         "carreras": sorted(carreras),
+        "carrera_nombres": {c: carrera_nombre(c) for c in carreras},
         "planes": sorted(planes),
         "common_resources": [],
         "progress_chart": progress_bar(materias),

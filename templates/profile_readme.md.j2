@@ -24,7 +24,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 ## 📝 Repositorios por carrera y plan
 
 {% for carrera in subjects_by_carrera|sort %}
-### {{ carrera|upper }}
+### {{ carrera|upper }} — {{ carrera_nombres[carrera] }}
 {% for plan in subjects_by_carrera[carrera]|sort %}
 #### Plan {{ plan }}
 {% for subject in subjects_by_carrera[carrera][plan] %}
