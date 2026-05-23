@@ -41,6 +41,13 @@ Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
    Fuente: el árbol local de este repo. No requiere token.
 
        uv run scripts/gen_repo_readme.py
+
+4. CONTRIBUTING de cada repo de materia  ->  <repo>/CONTRIBUTING.md
+   Fuente: CONTRIBUTING.md (raíz de este repo). Requiere token de escritura.
+   Correrlo tras editar el CONTRIBUTING.md de la raíz.
+
+       uv run scripts/sync_repos.py contributing            # dry-run
+       uv run scripts/sync_repos.py contributing --apply    # publica
 """
 
 from __future__ import annotations

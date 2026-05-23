@@ -24,6 +24,8 @@ Subcomandos:
                       sobrantes. El manifest es la única fuente de verdad.
 - `readmes`         → genera y publica el README de cada repo de materia desde
                       el manifest (idempotente; sobrescribe ediciones manuales).
+- `contributing`    → publica CONTRIBUTING.md (raíz de este repo) en cada repo
+                      de materia.
 
 Los subcomandos que escriben en la org soportan dry-run (sin --apply) o --dry-run.
 """
@@ -465,6 +467,57 @@ def readmes(
         )
     else:
         console.print(f"[green]✓ {changed} README(s) publicados.[/]")
+
+
+@app.command()
+def contributing(
+    apply: Annotated[bool, typer.Option("--apply", help="Publica el CONTRIBUTING.md")] = False,
+) -> None:
+    """Publica el CONTRIBUTING.md del repo de control en cada repo de materia.
+
+    El CONTRIBUTING.md de la raíz de este repo es la única fuente; se copia tal
+    cual a todos los repos de materia (de cualquier plan). Idempotente: solo
+    escribe donde difiere.
+    """
+    src = Path(__file__).parent.parent / "CONTRIBUTING.md"
+    if not src.exists():
+        raise typer.BadParameter(f"No existe {src}")
+    content = src.read_text(encoding="utf-8")
+
+    org = _client().get_organization(ORG_NAME)
+    changed = 0
+    for repo in org.get_repos():
+        if repo.archived or _classify(repo.name) is None:
+            continue
+        try:
+            current = repo.get_contents("CONTRIBUTING.md")
+            existing = current.decoded_content.decode("utf-8")
+        except Exception:
+            current = None
+            existing = None
+
+        if existing == content:
+            continue
+
+        changed += 1
+        console.print(f"  ~ {repo.name}")
+        if apply:
+            if current is None:
+                repo.create_file("CONTRIBUTING.md", "docs: agregar CONTRIBUTING", content)
+            else:
+                repo.update_file(
+                    "CONTRIBUTING.md", "docs: sincronizar CONTRIBUTING", content, current.sha
+                )
+
+    if not changed:
+        console.print("[green]✓ CONTRIBUTING.md ya está sincronizado en todos los repos.[/]")
+    elif not apply:
+        console.print(
+            f"[yellow]DRY-RUN: {changed} repo(s) a actualizar. "
+            f"Repetí con --apply para publicarlo.[/]"
+        )
+    else:
+        console.print(f"[green]✓ CONTRIBUTING.md publicado en {changed} repo(s).[/]")
 
 
 if __name__ == "__main__":

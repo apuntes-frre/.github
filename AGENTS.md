@@ -49,6 +49,10 @@ isi-2008-<slug>/
 Convención de archivos: `nombre-tema.md`, `guia-estudio-tema.md`, imágenes
 `nombre-tema-descripcion.png`.
 
+Cómo cargar apuntes (conversión por formato, herramientas Python vía `uvx`,
+flujo de trabajo): ver [`CONTRIBUTING.md`](CONTRIBUTING.md). Se publica en cada
+repo de materia con `uv run scripts/sync_repos.py contributing --apply`.
+
 ## Tooling
 
 Scripts en [`scripts/`](scripts/), PEP 723, ejecutados con `uv run`:
