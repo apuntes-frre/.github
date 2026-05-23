@@ -22,7 +22,7 @@ Guía para agentes de IA y colaboradores de la organización **apuntes-frre**
 
 ## Convención de nombres de repos
 
-```
+```text
 <carrera>-<plan>-<slug>
 ```
 
@@ -54,6 +54,7 @@ Scripts en [`scripts/`](scripts/), PEP 723, ejecutados con `uv run`:
 
 - `sync_repos.py` — operaciones org-wide (manifest, sync de repos, READMEs).
 - `sync_readme.py` — regenera el README público del perfil.
+- `gen_repo_readme.py` — regenera `docs/README.md` (inventario de este repo).
 - `init_repo.py` — scaffolding de estructura por repo.
 
 Los que escriben en la org soportan dry-run; agregar `--apply` para ejecutar.

@@ -29,33 +29,32 @@ Ejecutar con `uv run scripts/<nombre>` (dependencias inline, PEP 723).
 
 | Script | Propósito |
 | ------ | --------- |
-| `gen_repo_readme.py` | Regenera docs/README.md a partir del estado real del repo de control `.github`. |
-| `init_repo.py` | Inicializa o migra la estructura interna de un repositorio de materia. |
-| `sync_readme.py` | Regenera profile/README.md a partir del estado vivo de la organización. |
-| `sync_repos.py` | Operaciones org-wide sobre apuntes-frre. |
+{% for s in scripts %}
+| `{{ s.name }}` | {{ s.purpose }} |
+{% endfor %}
 
 ## ⚙️ Workflows (`.github/workflows/`)
 
 | Workflow | Triggers |
 | -------- | -------- |
-| `link-check.yml` — Link Check | schedule, workflow_dispatch, pull_request |
-| `repo-readme.yml` — Repo README | push, workflow_dispatch |
-| `repo-sync.yml` — Repo Structure Sync | schedule, workflow_dispatch |
-| `stale.yml` — Stale Issues & PRs | schedule, workflow_dispatch |
-| `subject-readmes.yml` — Subject READMEs | push, schedule, workflow_dispatch |
-| `update-profile-readme.yml` — Update Profile README | schedule, workflow_dispatch, repository_dispatch |
+{% for w in workflows %}
+| `{{ w.file }}` — {{ w.name }} | {{ w.triggers }} |
+{% endfor %}
 
 ## 📊 Manifests (`data/`)
 
-- `isi.toml`
+{% for d in data_files %}
+- `{{ d }}`
+{% endfor %}
 
 ## 🧩 Plantillas (`templates/`)
 
-- `profile_readme.md.j2`
-- `repo_readme.md.j2`
-- `subject_readme.md.j2`
+{% for t in templates %}
+- `{{ t }}`
+{% endfor %}
 
 ## 📚 Documentación (`docs/`)
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md)
-- [`ROADMAP.md`](ROADMAP.md)
+{% for d in docs %}
+- [`{{ d }}`]({{ d }})
+{% endfor %}

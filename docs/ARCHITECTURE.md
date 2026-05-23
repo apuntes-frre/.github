@@ -134,6 +134,7 @@ isi-2008-base-datos/
 | `update-profile-readme.yml` | `cron` semanal + `dispatch`                      | Regenera `profile/README.md`. Commit solo si hay diff.                  |
 | `subject-readmes.yml`       | `push` a `data/**` + `dispatch` + `cron` semanal | Regenera y publica el README de cada repo de materia desde el manifest. |
 | `repo-sync.yml`             | `dispatch` + `cron` mensual                      | Aplica `init_repo.py` a todos los repos de materia.                     |
+| `repo-readme.yml`           | `push` a `scripts/**`, `workflows/**`, `data/**` + `dispatch` | Regenera `docs/README.md` (inventario del repo de control). |
 | `link-check.yml`            | `cron` semanal + `dispatch`                      | Verifica enlaces rotos en docs.                                         |
 | `stale.yml`                 | `cron` diario                                    | Marca y cierra issues/PRs sin actividad.                                |
 
