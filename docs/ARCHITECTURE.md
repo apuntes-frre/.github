@@ -37,13 +37,14 @@ ejemplos, guías y recursos.
 | Path                                 | Propósito                                                 |
 | ------------------------------------ | --------------------------------------------------------- |
 | `profile/README.md`                  | Vista pública de la organización (auto-generada).         |
-| `profile/README.md.j2`           | Plantilla de la vista pública.                            |
+| `templates/profile_readme.md.j2`     | Plantilla de la vista pública.                            |
+| `templates/subject_readme.md.j2`     | Plantilla del README de cada repo de materia.             |
 | `docs/`                              | Documentación: roadmap, arquitectura, plan de refactor.   |
 | `data/<carrera>.toml`                | Manifest curricular (single source of truth).             |
 | `data/sources/`                      | PDFs originales del diseño curricular.                    |
 | `scripts/*.py`                       | Automatización (PEP 723, ejecutado con `uv run`).         |
 | `.github/workflows/*.yml`            | CI/CD del repo de control.                                |
-| `.github/copilot-instructions.md`    | Guías de IA para colaboradores.                           |
+| `AGENTS.md` / `CLAUDE.md`            | Guías de IA y colaboradores (CLAUDE.md referencia AGENTS).|
 
 ### 1.1 Manifest curricular `data/<carrera>.toml`
 

@@ -174,12 +174,12 @@ def _try_parse(s: str) -> datetime | None:
 
 def render(data: dict[str, Any]) -> str:
     env = Environment(
-        loader=FileSystemLoader(Path(__file__).parent.parent / "profile"),
+        loader=FileSystemLoader(Path(__file__).parent.parent / "templates"),
         trim_blocks=True,
         lstrip_blocks=True,
         keep_trailing_newline=True,
     )
-    return env.get_template("README.md.j2").render(**data)
+    return env.get_template("profile_readme.md.j2").render(**data)
 
 
 def main() -> int:
