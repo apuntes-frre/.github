@@ -9,7 +9,7 @@ on:
       - 'scripts/sync_repos.py'
       - '.github/workflows/subject-readmes.yml'
   schedule:
-    - cron: '0 4 * * 1'   # Lunes 04:00 UTC (red de seguridad semanal)
+    - cron: '0 4 * * 1' # Lunes 04:00 UTC (red de seguridad semanal)
   workflow_dispatch:
     inputs:
       plan:
@@ -36,7 +36,7 @@ jobs:
 
       - name: Publish subject READMEs
         env:
-          ORG_ADMIN_TOKEN: ${{ secrets.ORG_ADMIN_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           uv run scripts/sync_repos.py readmes isi \
             --plan "${{ github.event.inputs.plan || '2008' }}" \
