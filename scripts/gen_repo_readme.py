@@ -63,6 +63,7 @@ def collect_state() -> dict[str, Any]:
     scripts = [
         {"name": p.name, "purpose": _script_purpose(p)}
         for p in sorted((ROOT / "scripts").glob("*.py"))
+        if p.name not in {"__init__.py", "__main__.py"}
     ]
     workflows = [
         _workflow_info(p) for p in sorted((ROOT / ".github" / "workflows").glob("*.yml"))
