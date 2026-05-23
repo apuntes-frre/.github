@@ -66,8 +66,9 @@ Una organización ordenada y de bajo mantenimiento donde cualquier estudiante de
   `templates/subject_readme.md.j2` (por materia).
 - Comando `sync_repos.py readmes`: renderiza y publica el README de cada repo de
   materia; idempotente, sobrescribe ediciones manuales.
-- Workflow `subject-readmes.yml`: fan-out central en push a `data/**`, dispatch y
-  cron semanal.
+- Sin CI para los repos de materia: se sincronizan **a mano** tras editar el
+  manifest (evita gestionar un token de org). Ver el docstring de
+  `scripts/sync_readme.py` para el detalle de cada tipo de README.
 
 ### M4 · Guías de colaboración
 

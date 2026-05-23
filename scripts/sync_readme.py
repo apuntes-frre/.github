@@ -14,6 +14,33 @@ El script es idempotente: vuelve a renderizar la plantilla en memoria, compara
 con el archivo en disco y solo escribe (y por lo tanto, solo permite commit) si
 hay diferencias reales de contenido. Esto evita los commits diarios vacíos que
 se producían cuando la plantilla incluía la fecha actual.
+
+═══════════════════════════════════════════════════════════════════════════
+Sincronización manual de READMEs
+═══════════════════════════════════════════════════════════════════════════
+La org tiene tres tipos de README, todos autogenerados. No hay CI que los
+empuje a los repos de materia: se sincronizan a mano cuando hace falta.
+
+Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
+
+    export GITHUB_TOKEN="$(gh auth token)"
+
+1. README del PERFIL de la org  ->  profile/README.md
+   Fuente: estado vivo de la org (lista de repos). Requiere token.
+
+       uv run scripts/sync_readme.py
+
+2. README de CADA REPO DE MATERIA  ->  <repo>/README.md
+   Fuente: data/<carrera>.toml. Requiere token con acceso de escritura a la org.
+   Correrlo solo tras editar el manifest o templates/subject_readme.md.j2.
+
+       uv run scripts/sync_repos.py readmes isi --plan 2008            # dry-run
+       uv run scripts/sync_repos.py readmes isi --plan 2008 --apply    # publica
+
+3. INVENTARIO del repo de control  ->  docs/README.md
+   Fuente: el árbol local de este repo. No requiere token.
+
+       uv run scripts/gen_repo_readme.py
 """
 
 from __future__ import annotations

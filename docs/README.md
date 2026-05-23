@@ -42,7 +42,6 @@ Ejecutar con `uv run scripts/<nombre>` (dependencias inline, PEP 723).
 | `repo-readme.yml` — Repo README | push, workflow_dispatch |
 | `repo-sync.yml` — Repo Structure Sync | schedule, workflow_dispatch |
 | `stale.yml` — Stale Issues & PRs | schedule, workflow_dispatch |
-| `subject-readmes.yml` — Subject READMEs | push, schedule, workflow_dispatch |
 | `update-profile-readme.yml` — Update Profile README | schedule, workflow_dispatch, repository_dispatch |
 
 ## 📊 Manifests (`data/`)
