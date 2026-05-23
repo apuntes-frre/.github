@@ -1,8 +1,47 @@
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
 
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
 
-.ruff_cache
+# Entornos virtuales / uv
+.venv/
+venv/
+env/
+.python-version
+
+# Caches de herramientas
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.dmypy.json
+.coverage
+.coverage.*
+htmlcov/
+
+# Variables de entorno / secretos
+.env
+.env.*
+!.env.example
+
+# Editores / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
