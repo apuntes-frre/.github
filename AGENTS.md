@@ -1,24 +1,26 @@
 # AGENTS.md
 
-Guía para agentes de IA y colaboradores de la organización **apuntes-frre**
-(UTN-FRRE). Define convenciones e idioma. Para el detalle arquitectónico ver
+Guía para agentes de IA y colaboradores de la organización **apuntes-frre** (UTN-FRRE). Define
+convenciones e idioma. Para el detalle arquitectónico ver
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Idioma
 
 - El contenido (apuntes, READMEs, docs) se escribe en **español**.
-- El **código** y los identificadores van en **inglés** (nombres de scripts,
-  variables, slugs de repos).
+- El **código** y los identificadores de programación van en **inglés** (nombres de
+  scripts, variables, funciones).
+- Los **slugs de repos** derivan del nombre **en español** de la materia,
+  normalizado a ASCII (ej. `fisica-i`, `analisis-matematico-ii`). No se traducen.
 - Términos técnicos pueden quedar en inglés; explicarlos en español si hace falta.
 
 ## Fuente de verdad
 
-- [`data/<carrera>.toml`](data/) es la **única fuente de verdad** del plan
-  curricular (materias, niveles, correlativas). No inferir datos desde nombres
-  de repos ni descripciones: leer el manifest.
+- [`data/<carrera>.toml`](data/) es la **única fuente de verdad** del plan curricular (materias,
+  niveles, correlativas). No inferir datos desde nombres de repos ni descripciones: leer el
+  manifest.
 - Los READMEs de los repos de materia son **autogenerados** desde el manifest
-  ([`templates/subject_readme.md.j2`](templates/subject_readme.md.j2)). No
-  editarlos a mano: CI los sobrescribe.
+  ([`templates/subject_readme.md.j2`](templates/subject_readme.md.j2)). No editarlos a mano: CI los
+  sobrescribe.
 
 ## Convención de nombres de repos
 
@@ -32,8 +34,7 @@ Guía para agentes de IA y colaboradores de la organización **apuntes-frre**
 
 ## Estructura de un repo de materia
 
-Layout flat, **sin carpetas vacías** ni `.gitkeep`: las carpetas aparecen cuando
-hay material.
+Layout flat, **sin carpetas vacías** ni `.gitkeep`: las carpetas aparecen cuando hay material.
 
 ```text
 isi-2008-<slug>/
@@ -45,8 +46,8 @@ isi-2008-<slug>/
 └── resources/common/
 ```
 
-Convención de archivos: `nombre-tema.md`, `guia-estudio-tema.md`,
-imágenes `nombre-tema-descripcion.png`.
+Convención de archivos: `nombre-tema.md`, `guia-estudio-tema.md`, imágenes
+`nombre-tema-descripcion.png`.
 
 ## Tooling
 
