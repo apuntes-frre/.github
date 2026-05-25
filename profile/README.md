@@ -63,20 +63,24 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 ## 🗂 Material por año académico
 
+### 2019
+- [`isi-2008-arquitectura-de-computadoras`](https://github.com/apuntes-frre/isi-2008-arquitectura-de-computadoras/tree/main/notes/2019) — practica, teoria
+### 2018
+- [`isi-2008-gestion-de-datos`](https://github.com/apuntes-frre/isi-2008-gestion-de-datos/tree/main/notes/2018) — practica, teoria
 
 
 ## 🔄 Actualizaciones recientes
 
-- `2026-05-23` · **isi-2008-administracion-de-recursos** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-administracion-gerencial** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-algebra-y-geometria-analitica** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-algoritmos-y-estructuras-de-datos** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-analisis-de-sistemas** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-analisis-matematico-i** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-arquitectura-de-computadoras** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-comunicaciones** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-diseno-de-sistemas** — docs: sincronizar README desde manifest
-- `2026-05-23` · **isi-2008-fisica-i** — docs: sincronizar README desde manifest
+- `2026-05-23` · **isi-2008-administracion-de-recursos** — chore: agregar .gitignore
+- `2026-05-23` · **isi-2008-administracion-de-recursos** — docs: agregar CONTRIBUTING
+- `2026-05-23` · **isi-2008-administracion-gerencial** — chore: agregar .gitignore
+- `2026-05-23` · **isi-2008-administracion-gerencial** — docs: agregar CONTRIBUTING
+- `2026-05-23` · **isi-2008-algebra-y-geometria-analitica** — chore: agregar .gitignore
+- `2026-05-23` · **isi-2008-algebra-y-geometria-analitica** — docs: agregar CONTRIBUTING
+- `2026-05-23` · **isi-2008-algoritmos-y-estructuras-de-datos** — chore: agregar .gitignore
+- `2026-05-23` · **isi-2008-algoritmos-y-estructuras-de-datos** — docs: agregar CONTRIBUTING
+- `2026-05-23` · **isi-2008-analisis-de-sistemas** — chore: agregar .gitignore
+- `2026-05-23` · **isi-2008-analisis-de-sistemas** — docs: agregar CONTRIBUTING
 
 ---
 
