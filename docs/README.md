@@ -29,6 +29,7 @@ Ejecutar con `uv run scripts/<nombre>` (dependencias inline, PEP 723).
 
 | Script | Propósito |
 | ------ | --------- |
+| `example.py` | — |
 | `gen_repo_readme.py` | Regenera docs/README.md a partir del estado real del repo de control `.github`. |
 | `init_repo.py` | Inicializa o migra la estructura interna de un repositorio de materia. |
 | `sync_readme.py` | Regenera profile/README.md a partir del estado vivo de la organización. |
@@ -39,6 +40,7 @@ Ejecutar con `uv run scripts/<nombre>` (dependencias inline, PEP 723).
 | Workflow | Triggers |
 | -------- | -------- |
 | `link-check.yml` — Link Check | schedule, workflow_dispatch, pull_request |
+| `pat-test.yml` — pat-test | workflow_dispatch |
 | `repo-readme.yml` — Repo README | push, workflow_dispatch |
 | `repo-sync.yml` — Repo Structure Sync | schedule, workflow_dispatch |
 | `stale.yml` — Stale Issues & PRs | schedule, workflow_dispatch |
