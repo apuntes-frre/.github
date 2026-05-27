@@ -57,7 +57,6 @@ import re
 import sys
 import tomllib
 from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -74,7 +73,27 @@ REPO_NAME_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<plan>\d{4})-(?P<slug>[a-z0-
 LEGACY_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<slug>[a-z0-9-]+)$")
 DEFAULT_PLAN = "2008"
 
+# Mensajes de commit que no representan contenido de estudio.
+SCAFFOLD_MARKERS = (
+    "[skip ci]",
+    "sincronizar README",
+    "actualizar README",
+    "agregar CONTRIBUTING",
+    "agregar .gitignore",
+)
+SCAFFOLD_PREFIXES = ("chore", "ci", "build")
+
 console = Console()
+
+
+def is_scaffold(msg: str) -> bool:
+    """True si el commit es andamiaje (no contenido de estudio)."""
+    if msg.strip() == "Initial commit":
+        return True
+    if any(m in msg for m in SCAFFOLD_MARKERS):
+        return True
+    prefix = msg.split(":", 1)[0].split("(", 1)[0].strip().lower()
+    return prefix in SCAFFOLD_PREFIXES
 
 
 def carrera_nombre(code: str) -> str:
@@ -121,15 +140,27 @@ def list_year_topics(repo: Repository, year: str) -> list[str]:
     return sorted(temas)[:3]
 
 
+def latest_year_topics(repo: Repository) -> list[str]:
+    """Temas del año más reciente con notas, o lista vacía."""
+    try:
+        years = sorted(
+            (c.name for c in repo.get_contents("notes")
+             if c.type == "dir" and c.name.isdigit()),
+            reverse=True,
+        )
+    except Exception:
+        return []
+    return list_year_topics(repo, years[0]) if years else []
+
+
 def collect_org_state(org: Organization) -> dict[str, Any]:
-    subjects_by_carrera: dict[str, dict[str, list[dict[str, str]]]] = defaultdict(
+    subjects_by_carrera: dict[str, dict[str, list[dict[str, Any]]]] = defaultdict(
         lambda: defaultdict(list)
     )
-    year_subjects: dict[str, list[dict[str, Any]]] = defaultdict(list)
     recent: list[dict[str, str]] = []
     carreras: set[str] = set()
     planes: set[str] = set()
-    materias: list[dict[str, str]] = []
+    materias: list[dict[str, Any]] = []
 
     repos = list(org.get_repos())
     for repo in track(repos, description="Inspeccionando repos"):
@@ -142,81 +173,45 @@ def collect_org_state(org: Organization) -> dict[str, Any]:
         carreras.add(carrera)
         planes.add(plan)
 
+        description = (repo.description or "").strip()
         info = {
             "code": repo.name,
-            "name": humanize_slug(slug),
+            "display_name": description or humanize_slug(slug),
             "repo_url": repo.html_url,
-            "description": (repo.description or "").strip(),
-            "carrera": carrera,
-            "plan": plan,
+            "latest_topics": latest_year_topics(repo),
         }
         materias.append(info)
         subjects_by_carrera[carrera][plan].append(info)
 
         try:
-            for content in repo.get_contents("notes"):
-                if content.type == "dir" and content.name.isdigit():
-                    año = content.name
-                    year_subjects[año].append({
-                        "code": repo.name,
-                        "year_url": f"{repo.html_url}/tree/main/notes/{año}",
-                        "latest_topics": list_year_topics(repo, año),
-                    })
-        except Exception:
-            pass
-
-        try:
-            for commit in list(repo.get_commits()[:2]):
+            for commit in list(repo.get_commits()[:10]):
                 msg = commit.commit.message.split("\n", 1)[0]
-                if "[skip ci]" in msg or msg.startswith("docs: actualizar README"):
+                if is_scaffold(msg):
                     continue
                 recent.append({
                     "date": commit.commit.author.date.strftime("%Y-%m-%d"),
                     "subject": repo.name,
                     "description": msg,
                 })
+                break  # solo el commit de contenido más reciente por repo
         except Exception:
             pass
+
+    recent_updates = sorted(recent, key=lambda x: x["date"], reverse=True)[:5]
+    # Idempotente: la fecha solo cambia cuando cambia el contenido real.
+    last_updated = recent_updates[0]["date"] if recent_updates else "—"
 
     return {
         "subjects_by_carrera": {
             c: dict(planes_dict) for c, planes_dict in subjects_by_carrera.items()
         },
-        "years": sorted(year_subjects.keys(), reverse=True),
-        "year_subjects": dict(year_subjects),
-        "recent_updates": sorted(recent, key=lambda x: x["date"], reverse=True)[:10],
+        "recent_updates": recent_updates,
         "active_subjects": len(materias),
         "carreras": sorted(carreras),
-        "carrera_nombres": {c: carrera_nombre(c) for c in carreras},
+        "carrera_nombres": {c: carrera_nombre(c) for c in sorted(carreras)},
         "planes": sorted(planes),
-        "common_resources": [],
-        "progress_chart": progress_bar(materias),
+        "last_updated": last_updated,
     }
-
-
-def progress_bar(materias: list[dict[str, str]]) -> str:
-    """Porcentaje de materias con commits del mes en curso."""
-    if not materias:
-        return "░░░░░░░░░░ 0.0%"
-    now = datetime.now()
-    actualizadas = sum(
-        1
-        for m in materias
-        if (last := m.get("last_update"))
-        and (d := _try_parse(last))
-        and d.year == now.year
-        and d.month == now.month
-    )
-    pct = actualizadas / len(materias) * 100
-    blocks = int(pct / 10)
-    return "█" * blocks + "░" * (10 - blocks) + f" {pct:.1f}%"
-
-
-def _try_parse(s: str) -> datetime | None:
-    try:
-        return datetime.strptime(s, "%Y-%m-%d")
-    except ValueError:
-        return None
 
 
 def render(data: dict[str, Any]) -> str:

@@ -10,9 +10,8 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 ## 📊 Estado general
 
 - 📚 **Materias activas:** {{ active_subjects }}
-- 🎓 **Carreras:** {{ carreras|join(', ') }}
+- 🎓 **Carreras:** {{ carrera_nombres.values()|join(' · ') }}
 - 📆 **Planes de estudio:** {{ planes|join(', ') }}
-- 📈 **Cobertura del año en curso:** {{ progress_chart }}
 
 ## 🎯 Objetivos
 
@@ -26,30 +25,16 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 {% for carrera in subjects_by_carrera|sort %}
 ### {{ carrera|upper }} — {{ carrera_nombres[carrera] }}
 {% for plan in subjects_by_carrera[carrera]|sort %}
-#### Plan {{ plan }}
-{% for subject in subjects_by_carrera[carrera][plan] %}
-- 📁 [`{{ subject.code }}`]({{ subject.repo_url }}) — **{{ subject.name }}**{{ ' · ' ~ subject.description if subject.description else '' }}
-{% endfor %}
-{% endfor %}
-{% endfor %}
+<details>
+<summary><strong>Plan {{ plan }}</strong> · {{ subjects_by_carrera[carrera][plan]|length }} materias</summary>
 
-## 🗂 Material por año académico
+{% for subject in subjects_by_carrera[carrera][plan]|sort(attribute='display_name') %}
+- 📁 [`{{ subject.code }}`]({{ subject.repo_url }}) — **{{ subject.display_name }}**{{ ' — ' ~ subject.latest_topics|join(', ') if subject.latest_topics else '' }}
+{% endfor %}
+</details>
 
-{% for year in years %}
-### {{ year }}
-{% for subject in year_subjects[year] %}
-- [`{{ subject.code }}`]({{ subject.year_url }}){{ ' — ' ~ subject.latest_topics|join(', ') if subject.latest_topics else '' }}
 {% endfor %}
 {% endfor %}
-
-{% if common_resources %}
-## 📌 Recursos comunes
-
-{% for resource in common_resources %}
-- [{{ resource.name }}]({{ resource.url }}) — {{ resource.description }}
-{% endfor %}
-{% endif %}
-
 {% if recent_updates %}
 ## 🔄 Actualizaciones recientes
 
@@ -59,6 +44,13 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 {% endif %}
 
 ---
+
+<sub>
+🗓 Última actualización: {{ last_updated }} ·
+📚 {{ active_subjects }} materias ·
+🎓 {{ carreras|length }} carrera{{ 's' if carreras|length != 1 else '' }} ·
+📆 {{ planes|length }} plan{{ 'es' if planes|length != 1 else '' }}
+</sub>
 
 > Este README se regenera automáticamente desde
 > [`apuntes-frre/.github`](https://github.com/apuntes-frre/.github).
