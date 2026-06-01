@@ -65,7 +65,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 ## 🔄 Actualizaciones recientes
 
-- `2026-05-27` · **isi-2008-arquitectura-de-computadoras** — docs: agregar guia de autoestudio y tabla ASCII-EBCDIC
+- `2026-05-27` · **isi-2008-arquitectura-de-computadoras** — docs: transcribir guia de Assembler (07) y prefijar guias de practica
 - `2026-05-23` · **isi-2008-gestion-de-datos** — refactor: rename generador-de-tablas.py to csv-generator.py
 
 ---
