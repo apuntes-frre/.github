@@ -132,7 +132,7 @@ isi-2008-base-datos/
 | Workflow                    | Trigger                                          | Acción                                                                  |
 | --------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------- |
 | `update-profile-readme.yml` | `cron` semanal + `dispatch`                      | Regenera `profile/README.md`. Commit solo si hay diff.                  |
-| `repo-sync.yml`             | `dispatch` + `cron` mensual                      | Aplica `init_repo.py` a todos los repos de materia.                     |
+| `repo-sync.yml`             | `dispatch` + `cron` mensual                      | Ejecuta `init_repo.py` en clones temporales; cron en dry-run. No publica cambios. |
 | `repo-readme.yml`           | `push` a `scripts/**`, `workflows/**`, `data/**` + `dispatch` | Regenera `docs/README.md` (inventario del repo de control). |
 | `link-check.yml`            | `cron` semanal + `dispatch`                      | Verifica enlaces rotos en docs.                                         |
 | `stale.yml`                 | `cron` diario                                    | Marca y cierra issues/PRs sin actividad.                                |
@@ -175,8 +175,11 @@ script. CI usa `astral-sh/setup-uv@v5`.
 ## 🔒 Seguridad
 
 - `GITHUB_TOKEN` con permisos mínimos por workflow (`contents: write` solo donde se necesita).
-- Para acciones org-wide (sync de estructura) se requiere un PAT de admin almacenado como secret
-  `ORG_ADMIN_TOKEN` y solo accesible al workflow `repo-sync.yml`.
+- `repo-sync.yml` usa `GITHUB_TOKEN` con `contents: read`: lista los repos públicos de la
+  organización y trabaja en clones temporales. Solo un dispatch con `dry_run: false` modifica
+  esos clones; no hace commit ni push y los clones se eliminan al terminar.
+- Las operaciones de `sync_repos.py` que escriben en repos remotos requieren un token con
+  permisos para los repos afectados (`ORG_ADMIN_TOKEN`); no se ejecutan en `repo-sync.yml`.
 - Sin secrets en código. Validación con `gitleaks` opcional en CI.
 
 ## 🚪 Puntos de extensión
