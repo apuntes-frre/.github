@@ -14,6 +14,8 @@ on:
 jobs:
   inspect:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
 
@@ -30,13 +32,13 @@ jobs:
         run: uv run scripts/sync_repos.py inspect
 
       - name: Init structure on every subject repo
-        if: ${{ inputs.dry_run == false }}
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == false }}
         env:
-          ORG_ADMIN_TOKEN: ${{ secrets.ORG_ADMIN_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: uv run scripts/sync_repos.py init-all
 
       - name: Init structure (dry-run)
-        if: ${{ inputs.dry_run != false }}
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != false }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: uv run scripts/sync_repos.py init-all --dry-run
