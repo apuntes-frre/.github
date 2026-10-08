@@ -1,17 +1,22 @@
-name: Repo README
+name: Update READMEs
 
 on:
   push:
     branches: [main]
     paths:
       - 'scripts/**'
+      - 'templates/**'
+      - 'data/*.toml'
+      - 'docs/**'
       - '.github/workflows/**'
-      - 'data/**'
-      - 'templates/repo_readme.md.j2'
+  schedule:
+    - cron: '0 3 * * 1' # Lunes 03:00 UTC.
   workflow_dispatch:
+  repository_dispatch:
+    types: [subject-repo-updated]
 
 concurrency:
-  group: repo-readme
+  group: readme-publication-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -27,19 +32,26 @@ jobs:
         with:
           python-version: '3.12'
           enable-cache: true
-          cache-dependency-glob: 'scripts/gen_repo_readme.py'
+          cache-dependency-glob: 'scripts/*.py'
 
-      - name: Regenerate docs/README.md
+      - name: Regenerate inventory
         run: uv run scripts/gen_repo_readme.py
 
+      - name: Regenerate profile
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run scripts/sync_readme.py
+
       - name: Commit if changed
+        if: github.ref == 'refs/heads/main'
         run: |
-          if git diff --quiet -- docs/README.md; then
-            echo "Sin cambios; no se commitea."
+          if git diff --quiet -- docs/README.md profile/README.md; then
+            echo "Sin cambios reales; no se commitea."
             exit 0
           fi
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add docs/README.md
-          git commit -m "docs: regenerar inventario del repo [skip ci]"
-          git push
+          git add docs/README.md profile/README.md
+          git commit -m "docs: regenerar READMEs del control y perfil [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

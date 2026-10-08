@@ -9,55 +9,36 @@
 # ]
 # ///
 
-"""Operaciones org-wide sobre apuntes-frre.
+"""Audita y sincroniza repos de materia desde el manifest curricular.
 
-Subcomandos:
-
-- `inspect`         → lista los repos detectados y los clasifica por convención.
-- `init-all`        → ejecuta init_repo.py contra cada repo (clona temporalmente).
-- `rename`          → propone (o aplica) renombres al formato
-                      <carrera>-<plan>-<slug>.
-- `manifest list`   → lista materias declaradas en data/<carrera>.toml.
-- `manifest validate` → verifica que el DAG de correlativas no tenga huérfanas.
-- `manifest diff`   → diff entre repos expected (según manifest) y la org.
-- `manifest sync`   → crea faltantes, actualiza descripciones y reporta/archiva
-                      sobrantes. El manifest es la única fuente de verdad.
-- `readmes`         → genera y publica el README de cada repo de materia desde
-                      el manifest (idempotente; sobrescribe ediciones manuales).
-- `contributing`    → publica CONTRIBUTING.md (raíz de este repo) en cada repo
-                      de materia.
-- `gitignore`       → publica .gitignore (raíz de este repo) en cada repo
-                      de materia.
-
-Los subcomandos que escriben en la org soportan dry-run (sin --apply) o --dry-run.
+`inspect` y `manifest list/validate/diff` solo leen. `manifest sync`, `readmes`,
+`contributing` y `gitignore` muestran cambios pendientes; `--apply` los publica.
 """
 
 from __future__ import annotations
 
 import os
-import re
-import subprocess
 import sys
-import tempfile
-import tomllib
 from pathlib import Path
 from typing import Annotated, Any
 
 import typer  # ty: ignore
-from github import Github  # ty: ignore
+from github import Auth, Github, GithubException  # ty: ignore
 from github.Repository import Repository  # ty: ignore
-from jinja2 import Environment, FileSystemLoader  # ty: ignore
+from jinja2 import Template  # ty: ignore
 from rich.console import Console  # ty: ignore
 from rich.table import Table  # ty: ignore
 
-ORG_NAME = "apuntes-frre"
-DEFAULT_PLAN = "2008"
-DATA_DIR = Path(__file__).parent.parent / "data"
-TEMPLATE_DIR = Path(__file__).parent.parent / "templates"
-KNOWN_CARRERAS = {"isi", "lic", "tec"}
-
-NEW_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<plan>\d{4})-(?P<slug>[a-z0-9-]+)$")
-LEGACY_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<slug>[a-z0-9-]+)$")
+if __package__:
+    from .common import (
+        DEFAULT_PLAN, ORG_NAME, ROOT, get_plan, load_manifest,
+        load_manifests, parse_repo_name, template_environment,
+    )
+else:
+    from common import (
+        DEFAULT_PLAN, ORG_NAME, ROOT, get_plan, load_manifest,
+        load_manifests, parse_repo_name, template_environment,
+    )
 
 console = Console()
 app = typer.Typer(add_completion=False, no_args_is_help=True)
@@ -67,29 +48,29 @@ def _client() -> Github:
     token = os.getenv("ORG_ADMIN_TOKEN") or os.getenv("GITHUB_TOKEN")
     if not token:
         raise SystemExit("Falta ORG_ADMIN_TOKEN o GITHUB_TOKEN")
-    return Github(token)
-
-
-def _classify(name: str) -> tuple[str, str, str] | None:
-    if m := NEW_RE.match(name):
-        return m["carrera"], m["plan"], m["slug"]
-    if m := LEGACY_RE.match(name):
-        if m["carrera"] in KNOWN_CARRERAS:
-            return m["carrera"], DEFAULT_PLAN, m["slug"]
-    return None
+    return Github(auth=Auth.Token(token))
 
 
 def _load_manifest(carrera: str) -> dict[str, Any]:
-    path = DATA_DIR / f"{carrera}.toml"
-    if not path.exists():
-        raise typer.BadParameter(f"No existe manifest para carrera '{carrera}': {path}")
-    with path.open("rb") as f:
-        return tomllib.load(f)
+    try:
+        return load_manifest(carrera)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+
+def _plan_data(manifest: dict[str, Any], plan: str) -> dict[str, Any]:
+    try:
+        data = get_plan(manifest, plan)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    if data.get("correlativas-estado") == "pendientes":
+        console.print(f"[yellow]⚠ Plan {plan}: correlativas pendientes de definición FRRE.[/]")
+    return data
 
 
 def _expected_repo_names(manifest: dict[str, Any], plan: str) -> list[str]:
     carrera = manifest["carrera"]["codigo"]
-    materias = manifest["planes"][plan]["materias"]
+    materias = _plan_data(manifest, plan)["materias"]
     return [f"{carrera}-{plan}-{slug}" for slug in materias]
 
 
@@ -108,90 +89,14 @@ def inspect() -> None:
     table.add_column("Slug")
     table.add_column("Convención", style="bold")
 
-    legacy = 0
-    for repo in org.get_repos():
-        cls = _classify(repo.name)
-        if cls is None:
-            table.add_row(repo.name, "-", "-", "-", "[red]ignorado[/]")
+    for repo in sorted(org.get_repos(), key=lambda repo: repo.name):
+        parsed = parse_repo_name(repo.name)
+        if parsed is None:
+            table.add_row(repo.name, "-", "-", "-", "[dim]ignorado[/]")
             continue
-        carrera, plan, slug = cls
-        is_new = NEW_RE.match(repo.name) is not None
-        if not is_new:
-            legacy += 1
-        marker = "[green]nueva[/]" if is_new else "[yellow]legacy[/]"
-        table.add_row(repo.name, carrera, plan, slug, marker)
-
+        carrera, plan, slug = parsed
+        table.add_row(repo.name, carrera, plan, slug, "[green]actual[/]")
     console.print(table)
-    if legacy:
-        console.print(
-            f"[yellow]⚠ {legacy} repo(s) usan el formato legacy. "
-            f"Ejecutá `rename --dry-run` para ver el plan de migración.[/]"
-        )
-
-
-@app.command()
-def rename(
-    plan: Annotated[str, typer.Option(help="Plan de estudios a asignar")] = DEFAULT_PLAN,
-    apply: Annotated[bool, typer.Option("--apply", help="Aplica los cambios")] = False,
-) -> None:
-    """Renombra repos legacy <carrera>-<slug> → <carrera>-<plan>-<slug>."""
-    org = _client().get_organization(ORG_NAME)
-    pending: list[tuple[Repository, str]] = []
-
-    for repo in org.get_repos():
-        cls = _classify(repo.name)
-        if cls is None or NEW_RE.match(repo.name):
-            continue
-        carrera, _, slug = cls
-        new_name = f"{carrera}-{plan}-{slug}"
-        pending.append((repo, new_name))
-
-    if not pending:
-        console.print("[green]Nada que renombrar.[/]")
-        return
-
-    for repo, new in pending:
-        console.print(f"  • {repo.name} → [bold]{new}[/]")
-
-    if not apply:
-        console.print(
-            f"[yellow]DRY-RUN: {len(pending)} renombres pendientes. "
-            f"Repetí con --apply para ejecutarlos.[/]"
-        )
-        return
-
-    for repo, new in pending:
-        repo.edit(name=new)
-        console.print(f"[green]✓ {repo.name} → {new}[/]")
-
-
-@app.command("init-all")
-def init_all(
-    year: Annotated[int, typer.Option(help="Año académico a inicializar")] = 0,
-    dry_run: Annotated[bool, typer.Option("--dry-run")] = False,
-) -> None:
-    """Clona cada repo de materia y aplica scripts/init_repo.py."""
-    from datetime import datetime
-
-    año = year or datetime.now().year
-    org = _client().get_organization(ORG_NAME)
-    init_script = Path(__file__).with_name("init_repo.py")
-
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp_path = Path(tmp)
-        for repo in org.get_repos():
-            if _classify(repo.name) is None:
-                continue
-            target = tmp_path / repo.name
-            console.print(f"[cyan]→ {repo.name}[/]")
-            subprocess.run(
-                ["git", "clone", "--depth", "1", repo.clone_url, str(target)],
-                check=True,
-            )
-            cmd = ["uv", "run", str(init_script), "init", str(target), "--year", str(año)]
-            if dry_run:
-                cmd.append("--dry-run")
-            subprocess.run(cmd, check=True)
 
 
 @manifest_app.command("list")
@@ -201,10 +106,6 @@ def manifest_list(
 ) -> None:
     """Lista las materias declaradas en data/<carrera>.toml para un plan."""
     manifest = _load_manifest(carrera)
-    if plan not in manifest["planes"]:
-        raise typer.BadParameter(
-            f"Plan '{plan}' no existe. Disponibles: {sorted(manifest['planes'])}"
-        )
     table = Table(title=f"{manifest['carrera']['nombre']} — Plan {plan}")
     table.add_column("#", justify="right")
     table.add_column("Repo esperado", style="cyan")
@@ -213,7 +114,7 @@ def manifest_list(
     table.add_column("Bloque")
     table.add_column("Área")
 
-    materias = manifest["planes"][plan]["materias"]
+    materias = _plan_data(manifest, plan)["materias"]
     rows = sorted(materias.items(), key=lambda kv: kv[1]["orden"])
     for slug, m in rows:
         table.add_row(
@@ -231,23 +132,10 @@ def manifest_list(
 def manifest_validate(
     carrera: Annotated[str, typer.Argument()] = "isi",
 ) -> None:
-    """Verifica que el DAG de correlativas referencia solo slugs existentes."""
+    """Valida tipos, orden, referencias y ciclos de todos los planes."""
     manifest = _load_manifest(carrera)
-    errors: list[str] = []
-
-    for plan, plan_data in manifest["planes"].items():
-        materias = plan_data.get("materias", {})
-        slugs = set(materias)
-        for slug, m in materias.items():
-            for key in ("correlativas-cursar-cursadas", "correlativas-cursar-aprobadas", "correlativas-rendir-aprobadas"):
-                for ref in m.get(key, []):
-                    if ref not in slugs:
-                        errors.append(f"plan {plan} · {slug}.{key} → '{ref}' no existe")
-
-    if errors:
-        for e in errors:
-            console.print(f"[red]✗ {e}[/]")
-        raise typer.Exit(1)
+    for plan in manifest["planes"]:
+        _plan_data(manifest, plan)
     console.print("[green]✓ Manifest válido.[/]")
 
 
@@ -261,18 +149,11 @@ def manifest_diff(
     expected = set(_expected_repo_names(manifest, plan))
 
     org = _client().get_organization(ORG_NAME)
-    actual: set[str] = set()
-    for repo in org.get_repos():
-        if repo.archived:
-            continue
-        cls = _classify(repo.name)
-        if cls is None:
-            continue
-        c, p, slug = cls
-        if c != carrera:
-            continue
-        # Reescribimos legacy como si ya estuviera renombrado al plan default.
-        actual.add(f"{c}-{p}-{slug}" if NEW_RE.match(repo.name) else f"{c}-{plan}-{slug}")
+    repos = _carrera_repos_by_name(org, carrera, plan)
+    actual = set(repos)
+    subjects = manifest["planes"][plan]["materias"]
+    descriptions = {f"{carrera}-{plan}-{slug}": subject["nombre"] for slug, subject in subjects.items()}
+    drift = sorted(name for name in expected & actual if (repos[name].description or "") != descriptions[name])
 
     missing = sorted(expected - actual)
     extra = sorted(actual - expected)
@@ -285,25 +166,24 @@ def manifest_diff(
         console.print("[yellow]Sobrantes (en org, no en manifest):[/]")
         for r in extra:
             console.print(f"  • {r}")
-    if not missing and not extra:
-        console.print("[green]✓ Org y manifest coinciden.[/]")
+    if drift:
+        console.print("[cyan]Descripciones diferentes del manifest:[/]")
+        for name in drift:
+            console.print(f"  ~ {name} → {descriptions[name]}")
+    if missing or extra or drift:
+        raise typer.Exit(1)
+    console.print("[green]✓ Org y manifest coinciden.[/]")
 
 
 def _carrera_repos_by_name(org, carrera: str, plan: str) -> dict[str, Repository]:
-    """Repos de la carrera presentes en la org, indexados por nombre normalizado."""
-    repos: dict[str, Repository] = {}
-    for repo in org.get_repos():
-        if repo.archived:
-            continue
-        cls = _classify(repo.name)
-        if cls is None:
-            continue
-        c, p, slug = cls
-        if c != carrera:
-            continue
-        norm = f"{c}-{p}-{slug}" if NEW_RE.match(repo.name) else f"{c}-{plan}-{slug}"
-        repos[norm] = repo
-    return repos
+    """Repos activos de la carrera y el plan seleccionados."""
+    return {
+        repo.name: repo
+        for repo in org.get_repos()
+        if not repo.archived
+        and (parsed := parse_repo_name(repo.name)) is not None
+        and parsed[:2] == (carrera, plan)
+    }
 
 
 @manifest_app.command("sync")
@@ -321,11 +201,7 @@ def manifest_sync(
     defecto; agregá --apply para ejecutar.
     """
     manifest = _load_manifest(carrera)
-    if plan not in manifest["planes"]:
-        raise typer.BadParameter(
-            f"Plan '{plan}' no existe. Disponibles: {sorted(manifest['planes'])}"
-        )
-    materias = manifest["planes"][plan]["materias"]
+    materias = _plan_data(manifest, plan)["materias"]
     expected = {f"{carrera}-{plan}-{slug}": m["nombre"] for slug, m in materias.items()}
 
     org = _client().get_organization(ORG_NAME)
@@ -352,7 +228,7 @@ def manifest_sync(
         for name in extra:
             console.print(f"  - {existing[name].name}")
 
-    if not (missing or drift or (extra and archive)):
+    if not (missing or drift or extra):
         console.print("[green]✓ Org y manifest coinciden.[/]")
         return
 
@@ -377,20 +253,15 @@ def manifest_sync(
 
 
 def _render_subject_readme(
-    manifest: dict[str, Any], plan: str, slug: str
+    manifest: dict[str, Any], plan: str, slug: str, template: Template
 ) -> str:
     """Renderiza el README de una materia desde el manifest."""
     materia = manifest["planes"][plan]["materias"][slug]
     names = {s: m["nombre"] for s, m in manifest["planes"][plan]["materias"].items()}
-    resolve = lambda keys: [names[s] for s in keys if s in names]  # noqa: E731
+    resolve = lambda keys: [names[s] for s in keys]  # noqa: E731
 
-    env = Environment(
-        loader=FileSystemLoader(TEMPLATE_DIR),
-        trim_blocks=True,
-        lstrip_blocks=True,
-        keep_trailing_newline=True,
-    )
-    return env.get_template("subject_readme.md.j2").render(
+    return template.render(
+        prerequisites_pending=manifest["planes"][plan].get("correlativas-estado") == "pendientes",
         carrera=manifest["carrera"]["codigo"],
         carrera_nombre=manifest["carrera"]["nombre"],
         plan=plan,
@@ -419,15 +290,12 @@ def readmes(
     es la única fuente de verdad; cualquier edición manual del README se sobrescribe.
     """
     manifest = _load_manifest(carrera)
-    if plan not in manifest["planes"]:
-        raise typer.BadParameter(
-            f"Plan '{plan}' no existe. Disponibles: {sorted(manifest['planes'])}"
-        )
-    materias = manifest["planes"][plan]["materias"]
+    materias = _plan_data(manifest, plan)["materias"]
 
     org = _client().get_organization(ORG_NAME)
     repos = _carrera_repos_by_name(org, carrera, plan)
 
+    template = template_environment().get_template("subject_readme.md.j2")
     changed = 0
     for slug in materias:
         name = f"{carrera}-{plan}-{slug}"
@@ -436,29 +304,8 @@ def readmes(
             console.print(f"[yellow]⚠ {name}: repo ausente, omitido[/]")
             continue
 
-        rendered = _render_subject_readme(manifest, plan, slug)
-        try:
-            current = repo.get_contents("README.md")
-            existing = current.decoded_content.decode("utf-8")
-        except Exception:
-            current = None
-            existing = None
-
-        if existing == rendered:
-            continue
-
-        changed += 1
-        console.print(f"  ~ {name}")
-        if apply:
-            if current is None:
-                repo.create_file("README.md", "docs: README autogenerado desde manifest", rendered)
-            else:
-                repo.update_file(
-                    "README.md",
-                    "docs: sincronizar README desde manifest",
-                    rendered,
-                    current.sha,
-                )
+        rendered = _render_subject_readme(manifest, plan, slug, template)
+        changed += _publish_file(repo, "README.md", rendered, "docs: sincronizar README desde manifest", apply)
 
     if not changed:
         console.print("[green]✓ Todos los READMEs ya están sincronizados.[/]")
@@ -471,111 +318,66 @@ def readmes(
         console.print(f"[green]✓ {changed} README(s) publicados.[/]")
 
 
+def _publish_file(repo: Repository, path: str, content: str, message: str, apply: bool) -> bool:
+    """Compara un archivo y lo publica solo si difiere; solo 404 significa ausencia."""
+    try:
+        current = repo.get_contents(path)
+    except GithubException as exc:
+        if exc.status != 404:
+            raise
+        current = None
+    if current is not None and current.decoded_content.decode("utf-8") == content:
+        return False
+    console.print(f"  ~ {repo.name}/{path}")
+    if apply:
+        if current is None:
+            repo.create_file(path, message, content)
+        else:
+            repo.update_file(path, message, content, current.sha)
+    return True
+
+
+def _publish_shared_file(source: Path, path: str, message: str, apply: bool) -> None:
+    content = source.read_text(encoding="utf-8")
+    manifests = load_manifests()
+    org = _client().get_organization(ORG_NAME)
+    changed = 0
+    for repo in sorted(org.get_repos(), key=lambda repo: repo.name):
+        parsed = parse_repo_name(repo.name)
+        if repo.archived or parsed is None:
+            continue
+        career, plan, slug = parsed
+        manifest = manifests.get(career)
+        if manifest is None or plan not in manifest["planes"] or slug not in manifest["planes"][plan]["materias"]:
+            continue
+        changed += _publish_file(repo, path, content, message, apply)
+    if not changed:
+        console.print(f"[green]✓ {path} ya está sincronizado en todos los repos.[/]")
+    elif not apply:
+        console.print(f"[yellow]DRY-RUN: {changed} repo(s) a actualizar. Repetí con --apply para publicar {path}.[/]")
+    else:
+        console.print(f"[green]✓ {path} publicado en {changed} repo(s).[/]")
+
+
 @app.command()
 def contributing(
     apply: Annotated[bool, typer.Option("--apply", help="Publica el CONTRIBUTING.md")] = False,
 ) -> None:
-    """Publica el CONTRIBUTING.md del repo de control en cada repo de materia.
-
-    El CONTRIBUTING.md de la raíz de este repo es la única fuente; se copia tal
-    cual a todos los repos de materia (de cualquier plan). Idempotente: solo
-    escribe donde difiere.
-    """
-    src = Path(__file__).parent.parent / "CONTRIBUTING.md"
-    if not src.exists():
-        raise typer.BadParameter(f"No existe {src}")
-    content = src.read_text(encoding="utf-8")
-
-    org = _client().get_organization(ORG_NAME)
-    changed = 0
-    for repo in org.get_repos():
-        if repo.archived or _classify(repo.name) is None:
-            continue
-        try:
-            current = repo.get_contents("CONTRIBUTING.md")
-            existing = current.decoded_content.decode("utf-8")
-        except Exception:
-            current = None
-            existing = None
-
-        if existing == content:
-            continue
-
-        changed += 1
-        console.print(f"  ~ {repo.name}")
-        if apply:
-            if current is None:
-                repo.create_file("CONTRIBUTING.md", "docs: agregar CONTRIBUTING", content)
-            else:
-                repo.update_file(
-                    "CONTRIBUTING.md", "docs: sincronizar CONTRIBUTING", content, current.sha
-                )
-
-    if not changed:
-        console.print("[green]✓ CONTRIBUTING.md ya está sincronizado en todos los repos.[/]")
-    elif not apply:
-        console.print(
-            f"[yellow]DRY-RUN: {changed} repo(s) a actualizar. "
-            f"Repetí con --apply para publicarlo.[/]"
-        )
-    else:
-        console.print(f"[green]✓ CONTRIBUTING.md publicado en {changed} repo(s).[/]")
+    """Publica CONTRIBUTING.md en los repos de materia declarados en el manifest."""
+    _publish_shared_file(ROOT / "CONTRIBUTING.md", "CONTRIBUTING.md", "docs: sincronizar CONTRIBUTING", apply)
 
 
 @app.command()
 def gitignore(
     apply: Annotated[bool, typer.Option("--apply", help="Publica el .gitignore")] = False,
 ) -> None:
-    """Publica el .gitignore del repo de control en cada repo de materia.
-
-    El .gitignore de la raíz de este repo es la única fuente; se copia tal
-    cual a todos los repos de materia (de cualquier plan). Idempotente: solo
-    escribe donde difiere.
-    """
-    src = Path(__file__).parent.parent / "templates" / "subject.gitignore"
-    if not src.exists():
-        raise typer.BadParameter(f"No existe {src}")
-    content = src.read_text(encoding="utf-8")
-
-    org = _client().get_organization(ORG_NAME)
-    changed = 0
-    for repo in org.get_repos():
-        if repo.archived or _classify(repo.name) is None:
-            continue
-        try:
-            current = repo.get_contents(".gitignore")
-            existing = current.decoded_content.decode("utf-8")
-        except Exception:
-            current = None
-            existing = None
-
-        if existing == content:
-            continue
-
-        changed += 1
-        console.print(f"  ~ {repo.name}")
-        if apply:
-            if current is None:
-                repo.create_file(".gitignore", "chore: agregar .gitignore", content)
-            else:
-                repo.update_file(
-                    ".gitignore", "chore: sincronizar .gitignore", content, current.sha
-                )
-
-    if not changed:
-        console.print("[green]✓ .gitignore ya está sincronizado en todos los repos.[/]")
-    elif not apply:
-        console.print(
-            f"[yellow]DRY-RUN: {changed} repo(s) a actualizar. "
-            f"Repetí con --apply para publicarlo.[/]"
-        )
-    else:
-        console.print(f"[green]✓ .gitignore publicado en {changed} repo(s).[/]")
+    """Publica templates/subject.gitignore en los repos declarados en el manifest."""
+    _publish_shared_file(ROOT / "templates" / "subject.gitignore", ".gitignore", "chore: sincronizar .gitignore", apply)
 
 
 if __name__ == "__main__":
     try:
         app()
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Subproceso falló: {e}[/]")
-        sys.exit(e.returncode)
+    except (GithubException, OSError, ValueError) as exc:
+        console.print(f"✗ {exc}", markup=False)
+        sys.exit(1)

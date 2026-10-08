@@ -15,11 +15,10 @@ con el archivo en disco y solo escribe (y por lo tanto, solo permite commit) si
 hay diferencias reales de contenido. Esto evita los commits diarios vacíos que
 se producían cuando la plantilla incluía la fecha actual.
 
-═══════════════════════════════════════════════════════════════════════════
-Sincronización manual de READMEs
-═══════════════════════════════════════════════════════════════════════════
-La org tiene tres tipos de README, todos autogenerados. No hay CI que los
-empuje a los repos de materia: se sincronizan a mano cuando hace falta.
+Sincronización de READMEs
+------------------------
+repo-readme.yml regenera el perfil y el inventario en un solo commit.
+Los archivos de los repos de materia se publican manualmente con --apply.
 
 Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
 
@@ -48,6 +47,12 @@ Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
 
        uv run scripts/sync_repos.py contributing            # dry-run
        uv run scripts/sync_repos.py contributing --apply    # publica
+
+5. .gitignore de cada repo de materia  ->  <repo>/.gitignore
+   Fuente: templates/subject.gitignore. Requiere token de escritura.
+
+       uv run scripts/sync_repos.py gitignore            # dry-run
+       uv run scripts/sync_repos.py gitignore --apply    # publica
 """
 
 from __future__ import annotations
@@ -55,30 +60,29 @@ from __future__ import annotations
 import os
 import re
 import sys
-import tomllib
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-from github import Github  # ty: ignore
+from github import Auth, Github, GithubException  # ty: ignore
 from github.Organization import Organization  # ty: ignore
 from github.Repository import Repository  # ty: ignore
-from jinja2 import Environment, FileSystemLoader  # ty: ignore
 from rich.console import Console  # ty: ignore
 from rich.progress import track  # ty: ignore
 
-ORG_NAME = "apuntes-frre"
-DATA_DIR = Path(__file__).parent.parent / "data"
-REPO_NAME_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<plan>\d{4})-(?P<slug>[a-z0-9-]+)$")
-LEGACY_RE = re.compile(r"^(?P<carrera>[a-z]+)-(?P<slug>[a-z0-9-]+)$")
-DEFAULT_PLAN = "2008"
+if __package__:
+    from .common import ORG_NAME, ROOT, load_manifests, parse_repo_name, template_environment
+else:
+    from common import ORG_NAME, ROOT, load_manifests, parse_repo_name, template_environment
 
 # Mensajes de commit que no representan contenido de estudio.
 SCAFFOLD_MARKERS = (
     "[skip ci]",
     "sincronizar README",
     "actualizar README",
+    "README autogenerado desde manifest",
     "agregar CONTRIBUTING",
+    "sincronizar CONTRIBUTING",
     "agregar .gitignore",
 )
 SCAFFOLD_PREFIXES = ("chore", "ci", "build")
@@ -96,16 +100,6 @@ def is_scaffold(msg: str) -> bool:
     return prefix in SCAFFOLD_PREFIXES
 
 
-def carrera_nombre(code: str) -> str:
-    """Nombre completo de la carrera desde data/<code>.toml; fallback al código."""
-    path = DATA_DIR / f"{code}.toml"
-    if path.exists():
-        with path.open("rb") as f:
-            data = tomllib.load(f)
-        return data.get("carrera", {}).get("nombre", code.upper())
-    return code.upper()
-
-
 def load_token() -> str:
     token = os.getenv("GITHUB_TOKEN")
     if not token:
@@ -113,44 +107,25 @@ def load_token() -> str:
     return token
 
 
-def parse_repo_name(name: str) -> tuple[str, str, str] | None:
-    """Devuelve (carrera, plan, slug) o None si no es un repo de materia."""
-    if m := REPO_NAME_RE.match(name):
-        return m["carrera"], m["plan"], m["slug"]
-    if m := LEGACY_RE.match(name):
-        carrera, slug = m["carrera"], m["slug"]
-        if carrera in {"isi", "lic", "tec"}:
-            return carrera, DEFAULT_PLAN, slug
-    return None
-
-
-def humanize_slug(slug: str) -> str:
-    return slug.replace("-", " ").title()
-
-
-def list_year_topics(repo: Repository, year: str) -> list[str]:
-    try:
-        contenido = repo.get_contents(f"notes/{year}")
-    except Exception:
-        return []
-    temas: list[str] = []
-    for item in contenido:
-        if item.type == "dir" and item.name not in {"recursos", "resources"}:
-            temas.append(item.name)
-    return sorted(temas)[:3]
-
-
 def latest_year_topics(repo: Repository) -> list[str]:
-    """Temas del año más reciente con notas, o lista vacía."""
+    """Hasta tres nombres de notas reales del último año con contenido."""
     try:
-        years = sorted(
-            (c.name for c in repo.get_contents("notes")
-             if c.type == "dir" and c.name.isdigit()),
-            reverse=True,
-        )
-    except Exception:
+        tree = repo.get_git_tree(repo.default_branch, recursive=True)
+    except GithubException as exc:
+        if exc.status == 409:  # Repositorio todavía vacío.
+            return []
+        raise
+    if tree.truncated:
+        raise ValueError(f"{repo.name}: árbol de archivos incompleto")
+    notes: dict[str, list[str]] = defaultdict(list)
+    for item in tree.tree:
+        if item.type == "blob" and Path(item.path).stem.lower() != "readme" and (match := re.fullmatch(r"notes/(\d{4})/(.+)\.md", item.path)):
+            notes[match[1]].append(item.path)
+    if not notes:
         return []
-    return list_year_topics(repo, years[0]) if years else []
+    paths = sorted(notes[max(notes)])
+    names = (Path(path).stem.replace("-", " ").replace("_", " ").capitalize() for path in paths)
+    return list(dict.fromkeys(names))[:3]
 
 
 def collect_org_state(org: Organization) -> dict[str, Any]:
@@ -162,21 +137,25 @@ def collect_org_state(org: Organization) -> dict[str, Any]:
     planes: set[str] = set()
     materias: list[dict[str, Any]] = []
 
-    repos = list(org.get_repos())
+    manifests = load_manifests()
+    repos = sorted(org.get_repos(), key=lambda repo: repo.name)
     for repo in track(repos, description="Inspeccionando repos"):
-        if repo.archived:
+        if repo.archived or repo.private:
             continue
         parsed = parse_repo_name(repo.name)
         if parsed is None:
             continue
         carrera, plan, slug = parsed
+        manifest = manifests.get(carrera)
+        if manifest is None or plan not in manifest["planes"] or slug not in manifest["planes"][plan]["materias"]:
+            console.print(f"[yellow]⚠ {repo.name}: no está declarado en el manifest; omitido.[/]")
+            continue
         carreras.add(carrera)
         planes.add(plan)
 
-        description = (repo.description or "").strip()
         info = {
             "code": repo.name,
-            "display_name": description or humanize_slug(slug),
+            "display_name": manifest["planes"][plan]["materias"][slug]["nombre"],
             "repo_url": repo.html_url,
             "latest_topics": latest_year_topics(repo),
         }
@@ -190,14 +169,16 @@ def collect_org_state(org: Organization) -> dict[str, Any]:
                     continue
                 recent.append({
                     "date": commit.commit.author.date.strftime("%Y-%m-%d"),
+                    "timestamp": commit.commit.author.date.isoformat(),
                     "subject": repo.name,
                     "description": msg,
                 })
                 break  # solo el commit de contenido más reciente por repo
-        except Exception:
-            pass
+        except GithubException as exc:
+            if exc.status != 409:
+                raise
 
-    recent_updates = sorted(recent, key=lambda x: x["date"], reverse=True)[:5]
+    recent_updates = sorted(recent, key=lambda x: (x["timestamp"], x["subject"]), reverse=True)[:5]
     # Idempotente: la fecha solo cambia cuando cambia el contenido real.
     last_updated = recent_updates[0]["date"] if recent_updates else "—"
 
@@ -208,31 +189,25 @@ def collect_org_state(org: Organization) -> dict[str, Any]:
         "recent_updates": recent_updates,
         "active_subjects": len(materias),
         "carreras": sorted(carreras),
-        "carrera_nombres": {c: carrera_nombre(c) for c in sorted(carreras)},
+        "carrera_nombres": {c: manifests[c]["carrera"]["nombre"] for c in sorted(carreras)},
         "planes": sorted(planes),
         "last_updated": last_updated,
     }
 
 
 def render(data: dict[str, Any]) -> str:
-    env = Environment(
-        loader=FileSystemLoader(Path(__file__).parent.parent / "templates"),
-        trim_blocks=True,
-        lstrip_blocks=True,
-        keep_trailing_newline=True,
-    )
-    return env.get_template("profile_readme.md.j2").render(**data)
+    return template_environment().get_template("profile_readme.md.j2").render(**data)
 
 
 def main() -> int:
-    g = Github(load_token())
+    g = Github(auth=Auth.Token(load_token()))
     org = g.get_organization(ORG_NAME)
 
     console.print(f"[bold blue]📥 Recolectando estado de {ORG_NAME}…[/]")
     data = collect_org_state(org)
 
     rendered = render(data)
-    target = Path(__file__).parent.parent / "profile" / "README.md"
+    target = ROOT / "profile" / "README.md"
     current = target.read_text(encoding="utf-8") if target.exists() else ""
 
     if rendered == current:
@@ -245,4 +220,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except (GithubException, OSError, ValueError) as exc:
+        console.print(f"✗ {exc}", markup=False)
+        sys.exit(1)

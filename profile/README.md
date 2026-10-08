@@ -32,13 +32,13 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 - 📁 [`isi-2008-analisis-de-sistemas`](https://github.com/apuntes-frre/isi-2008-analisis-de-sistemas) — **Análisis de Sistemas**
 - 📁 [`isi-2008-analisis-matematico-i`](https://github.com/apuntes-frre/isi-2008-analisis-matematico-i) — **Análisis Matemático I**
 - 📁 [`isi-2008-analisis-matematico-ii`](https://github.com/apuntes-frre/isi-2008-analisis-matematico-ii) — **Análisis Matemático II**
-- 📁 [`isi-2008-arquitectura-de-computadoras`](https://github.com/apuntes-frre/isi-2008-arquitectura-de-computadoras) — **Arquitectura de Computadoras** — guia-autoestudio, practica, teoria
+- 📁 [`isi-2008-arquitectura-de-computadoras`](https://github.com/apuntes-frre/isi-2008-arquitectura-de-computadoras) — **Arquitectura de Computadoras** — 01 guia combinacionales, 00 guia codificacion, Guia sistemas numericos
 - 📁 [`isi-2008-comunicaciones`](https://github.com/apuntes-frre/isi-2008-comunicaciones) — **Comunicaciones**
 - 📁 [`isi-2008-diseno-de-sistemas`](https://github.com/apuntes-frre/isi-2008-diseno-de-sistemas) — **Diseño de Sistemas**
 - 📁 [`isi-2008-economia`](https://github.com/apuntes-frre/isi-2008-economia) — **Economía**
 - 📁 [`isi-2008-fisica-i`](https://github.com/apuntes-frre/isi-2008-fisica-i) — **Física I**
 - 📁 [`isi-2008-fisica-ii`](https://github.com/apuntes-frre/isi-2008-fisica-ii) — **Física II**
-- 📁 [`isi-2008-gestion-de-datos`](https://github.com/apuntes-frre/isi-2008-gestion-de-datos) — **Gestión de Datos** — practica, teoria
+- 📁 [`isi-2008-gestion-de-datos`](https://github.com/apuntes-frre/isi-2008-gestion-de-datos) — **Gestión de Datos**
 - 📁 [`isi-2008-ingenieria-de-software`](https://github.com/apuntes-frre/isi-2008-ingenieria-de-software) — **Ingeniería de Software**
 - 📁 [`isi-2008-ingenieria-y-sociedad`](https://github.com/apuntes-frre/isi-2008-ingenieria-y-sociedad) — **Ingeniería y Sociedad**
 - 📁 [`isi-2008-ingles-i`](https://github.com/apuntes-frre/isi-2008-ingles-i) — **Inglés I**

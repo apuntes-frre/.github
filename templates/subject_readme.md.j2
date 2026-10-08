@@ -1,5 +1,5 @@
 <!-- AUTOGENERADO desde apuntes-frre/.github (data/{{ carrera }}.toml).
-     No editar a mano: los cambios se sobrescriben en el próximo run de CI. -->
+     No editar a mano: los cambios se sobrescriben en la próxima sincronización manual. -->
 # 📚 {{ nombre }}
 
 > Materia de **{{ carrera_nombre }}** — Plan {{ plan }}.
@@ -14,7 +14,13 @@
 - ⭐ **Materia integradora**
 {% endif %}
 
-{% if cursar_cursadas or cursar_aprobadas or rendir_aprobadas or rendir_todas %}
+{% if prerequisites_pending %}
+## 🔗 Correlativas
+
+Pendientes de definición por UTN-FRRE. La ausencia de correlativas cargadas
+no significa que esta materia no tenga requisitos.
+
+{% elif cursar_cursadas or cursar_aprobadas or rendir_aprobadas or rendir_todas %}
 ## 🔗 Correlativas
 
 {% if cursar_cursadas %}

@@ -19,8 +19,8 @@ convenciones e idioma. Para el detalle arquitectónico ver
   niveles, correlativas). No inferir datos desde nombres de repos ni descripciones: leer el
   manifest.
 - Los READMEs de los repos de materia son **autogenerados** desde el manifest
-  ([`templates/subject_readme.md.j2`](templates/subject_readme.md.j2)). No editarlos a mano: CI los
-  sobrescribe.
+  ([`templates/subject_readme.md.j2`](templates/subject_readme.md.j2)). No editarlos a mano:
+  la sincronización manual los sobrescribe.
 
 ## Convención de nombres de repos
 
@@ -60,6 +60,13 @@ Scripts en [`scripts/`](scripts/), PEP 723, ejecutados con `uv run`:
 - `sync_repos.py` — operaciones org-wide (manifest, sync de repos, READMEs).
 - `sync_readme.py` — regenera el README público del perfil.
 - `gen_repo_readme.py` — regenera `docs/README.md` (inventario de este repo).
-- `init_repo.py` — scaffolding de estructura por repo.
+- `common.py` — módulo compartido de manifests y plantillas; no es un ejecutable.
+
+`manifest validate` verifica campos, referencias y ciclos. `manifest diff`
+compara solo la carrera y el plan seleccionados; sale con código 1 ante
+repos faltantes, sobrantes o descripciones diferentes.
+Las correlativas del plan 2023 están pendientes: no inferir que no hay requisitos.
+
+Para verificar cambios sin acceder a GitHub: `uv run tests/test_scripts.py`.
 
 Los que escriben en la org soportan dry-run; agregar `--apply` para ejecutar.

@@ -25,7 +25,7 @@ def _summary(path: Path) -> str:
 
 
 def main() -> None:
-    print("Scripts de automatización (uv run scripts/<nombre>.py):\n")
+    print("Scripts y módulos de automatización (common.py no es ejecutable):\n")
     for path in sorted(HERE.glob("*.py")):
         if path.name in SKIP:
             continue
