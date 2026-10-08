@@ -1,44 +1,28 @@
-name: Repo Structure Sync
+name: Repository Audit
 
 on:
   schedule:
-    - cron: '0 6 1 * *'   # Día 1 de cada mes, 06:00 UTC
+    - cron: '0 6 1 * *' # Día 1 de cada mes, 06:00 UTC.
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Solo mostrar acciones, sin aplicar'
-        required: false
-        type: boolean
-        default: true
+
+permissions:
+  contents: read
 
 jobs:
-  inspect:
+  audit:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v7
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: 'scripts/sync_repos.py'
 
-      - name: Inspect org
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run scripts/sync_repos.py inspect
+      - name: Validate manifest
+        run: uv run scripts/sync_repos.py manifest validate isi
 
-      - name: Init structure on every subject repo
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == false }}
+      - name: Compare published plan 2008 with manifest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run scripts/sync_repos.py init-all
-
-      - name: Init structure (dry-run)
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != false }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run scripts/sync_repos.py init-all --dry-run
+        run: uv run scripts/sync_repos.py manifest diff isi --plan 2008

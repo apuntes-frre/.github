@@ -19,13 +19,16 @@ para todos los repos de materia. Detalle en
 ├── docs/                   # documentación de la organización
 ├── profile/                # README público de la organización (autogenerado)
 ├── scripts/                # automatización (PEP 723, `uv run`)
-├── templates/              # plantillas Jinja de los READMEs
+├── templates/              # plantillas de READMEs y .gitignore
+├── tests/                  # regresiones sin llamadas a GitHub
 └── .github/workflows/      # CI/CD del repo de control
 ```
 
-## 🐍 Scripts (`scripts/`)
+## 🐍 Scripts y módulos (`scripts/`)
 
-Ejecutar con `uv run scripts/<nombre>` (dependencias inline, PEP 723).
+Ejecutar los scripts con `uv run scripts/<nombre>` (dependencias inline, PEP 723).
+`common.py` es un módulo compartido; no se ejecuta directamente.
+Las regresiones se verifican con `uv run tests/test_scripts.py`.
 
 | Script | Propósito |
 | ------ | --------- |

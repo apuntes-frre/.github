@@ -1,7 +1,7 @@
 # Manifiesto de la carrera Ingeniería en Sistemas de Información (ISI)
 #
 # Universidad Tecnológica Nacional — Facultad Regional Resistencia (UTN-FRRE).
-# Single source of truth para scripts de scaffolding (init_repo.py, sync_repos.py)
+# Single source of truth para scripts de sincronización (sync_repos.py, sync_readme.py)
 # y como referencia legible del plan curricular completo.
 #
 # Fuentes (ver data/sources/):
@@ -37,6 +37,7 @@ titulo = "Ingeniero/a en Sistemas de Información"
 # ============================================================================
 
 [planes.2008]
+correlativas-estado = "completas"
 nombre = "Plan 2008"
 ordenanza = 1150
 ordenanza-anio = 2007
@@ -540,6 +541,7 @@ nivel-5 = { hs-semanales = 14 }
 # ============================================================================
 
 [planes.2023]
+correlativas-estado = "pendientes"
 nombre = "Plan 2023"
 ordenanza = 1877
 ordenanza-anio = 2022

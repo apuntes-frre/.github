@@ -1,10 +1,14 @@
 # Cómo contribuir apuntes
 
-Este repo es parte de la organización
-[apuntes-frre](https://github.com/apuntes-frre) (UTN-FRRE) y contiene los apuntes
-de **una materia**. Acá está cómo aportar material nuevo de forma consistente.
+Esta guía se aplica a los repositorios de materias de
+[apuntes-frre](https://github.com/apuntes-frre) (UTN-FRRE). Explica cómo aportar
+material nuevo de forma consistente.
 
-> ⚠️ El `README.md` de este repo es **autogenerado** desde el manifest curricular
+Para modificar scripts, manifests o plantillas del repo de control `.github`,
+consultá [su arquitectura](https://github.com/apuntes-frre/.github/blob/main/docs/ARCHITECTURE.md)
+y abrí un PR con los cambios y su validación.
+
+> ⚠️ El `README.md` de cada repo de materia es **autogenerado** desde el manifest curricular
 > (ver [`.github/data`](https://github.com/apuntes-frre/.github/tree/main/data)).
 > **No lo edites a mano**: se sobrescribe en la próxima sincronización.
 
@@ -79,7 +83,7 @@ prolijo: **transcribir con Claude** (visión) a Markdown/LaTeX. La imagen origin
 si aporta, va a `resources/<año>/` y se enlaza desde el `.md`:
 
 ```markdown
-![Diagrama entidad-relación](../../resources/2026/der-ventas.png)
+![Diagrama entidad-relación](../../../resources/2026/der-ventas.png)
 ```
 
 ### Google Docs

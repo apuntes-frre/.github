@@ -23,10 +23,12 @@ from pathlib import Path
 from typing import Any
 
 import yaml  # ty: ignore
-from jinja2 import Environment, FileSystemLoader  # ty: ignore
 from rich.console import Console  # ty: ignore
 
-ROOT = Path(__file__).parent.parent
+if __package__:
+    from .common import ROOT, template_environment
+else:
+    from common import ROOT, template_environment
 console = Console()
 
 
@@ -69,7 +71,7 @@ def collect_state() -> dict[str, Any]:
         _workflow_info(p) for p in sorted((ROOT / ".github" / "workflows").glob("*.yml"))
     ]
     data_files = [p.name for p in sorted((ROOT / "data").glob("*.toml"))]
-    templates = [p.name for p in sorted((ROOT / "templates").glob("*.j2"))]
+    templates = [p.name for p in sorted((ROOT / "templates").iterdir()) if p.is_file()]
     docs = [
         p.name for p in sorted((ROOT / "docs").glob("*.md")) if p.name != "README.md"
     ]
@@ -83,13 +85,7 @@ def collect_state() -> dict[str, Any]:
 
 
 def render(data: dict[str, Any]) -> str:
-    env = Environment(
-        loader=FileSystemLoader(ROOT / "templates"),
-        trim_blocks=True,
-        lstrip_blocks=True,
-        keep_trailing_newline=True,
-    )
-    return env.get_template("repo_readme.md.j2").render(**data)
+    return template_environment().get_template("repo_readme.md.j2").render(**data)
 
 
 def main() -> int:
