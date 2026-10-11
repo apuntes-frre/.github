@@ -51,16 +51,37 @@ En otros hosts, verificar disponibilidad e instalar las herramientas necesarias.
 [`uv`](https://docs.astral.sh/uv/) permite ejecutar herramientas Python con
 `uvx` cuando no hay una instalación administrada disponible.
 
+Los repos reciben `.github/transcription/` y `Validate Transcription` en CI.
+El bootstrap de materias nuevas los instala inmediatamente; también se
+sincronizan en las existentes. El flujo se documenta en
+`docs/TRANSCRIPTION.md` del repo de control. Un mapeo pendiente requiere
+identificar el original antes de delegar; un nombre de archivo aparentemente
+correcto puede pertenecer a otra materia.
+
 ## 🔁 Flujo
 
 1. `gh repo clone apuntes-frre/<repo-de-la-materia>`
 2. Leé `AGENTS.md` e inventariá originales y material existente.
-3. Convertí en un directorio temporal nuevo; preservá la fuente y sus figuras.
+3. Ejecutá el preflight y convertí en un directorio temporal nuevo; preservá
+   la fuente y sus figuras.
 4. Ubicá el `.md` en `notes/<año>/{teoria|practica}/` y verificá su contenido.
 5. Entregá los cambios en una rama de revisión; publicá según la autorización.
 
 Los manuscritos, diagramas y fórmulas requieren comparación visual. La salida
 de OCR o de un modelo es una propuesta de transcripción; señalá lo ilegible.
+
+```sh
+mise exec -- uv run .github/transcription/preflight.py --engine pymupdf4llm \
+  --work-dir /ruta/temporal/nueva /ruta/OneDrive/fuente.pdf
+mise exec -- mdformat --extensions gfm --extensions myst --wrap 80 \
+  --compact-tables notes/2026/teoria/tema.md
+mise -C .github/transcription exec -- uv run check.py --self-test
+mise -C .github/transcription exec -- uv run check.py --base origin/main
+```
+
+GFM + MyST preserva la notación matemática; GFM solo no la preserva. La
+validación se limita al cambio, incluye referencias a medios eliminados y
+usa KaTeX para detectar LaTeX inválido. Revisá fórmulas después de formatear.
 
 ## Convertir según el formato de origen
 

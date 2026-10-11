@@ -5,9 +5,12 @@ on:
     branches: [main]
     paths:
       - 'templates/subject_agents.md'
+      - 'templates/transcription/**'
       - 'CONTRIBUTING.md'
       - 'scripts/sync_repos.py'
       - 'scripts/common.py'
+      - 'scripts/check_transcription.py'
+      - 'scripts/transcription_preflight.py'
       - 'data/*.toml'
       - '.github/workflows/subject-agents.yml'
   schedule:
@@ -34,7 +37,7 @@ jobs:
           python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: 'scripts/sync_repos.py'
-      - name: Synchronize agent instructions
-        run: uv run scripts/sync_repos.py agents --apply
-      - name: Synchronize conversion guide
-        run: uv run scripts/sync_repos.py contributing --apply
+      - name: Check synchronization credential
+        run: uv run scripts/sync_repos.py auth
+      - name: Synchronize instructions and validation
+        run: uv run scripts/sync_repos.py bootstrap --apply

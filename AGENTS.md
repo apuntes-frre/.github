@@ -55,11 +55,13 @@ repo de materia con `uv run scripts/sync_repos.py contributing --apply`.
 
 Las instrucciones Codex de las materias provienen de
 [`templates/subject_agents.md`](templates/subject_agents.md). `manifest sync
---apply` instala `AGENTS.md` al crear cada repo; `uv run scripts/sync_repos.py
-agents --apply` sincroniza los repos existentes declarados en el manifest.
-El workflow `subject-agents.yml` publica esa plantilla y CONTRIBUTING al cambiar
-sus fuentes en main, diariamente o por dispatch. Usa el secreto `PAT_TOKEN`
-con permisos de escritura sobre los repos de materia.
+--apply` instala el bootstrap al crear cada repo; `uv run scripts/sync_repos.py
+agents --apply` sincroniza solo esa plantilla. `bootstrap --apply` sincroniza
+AGENTS, CONTRIBUTING, preflight, validador, configuración y CI. La creación
+instala el bootstrap completo; repetirlo repara una creación parcial.
+El workflow `subject-agents.yml` publica el conjunto al cambiar sus fuentes
+en main, diariamente o por dispatch. `PAT_TOKEN` requiere Contents y Workflows:
+write en la org. Ejecutar `auth` primero y seguir [el flujo](docs/TRANSCRIPTION.md).
 
 ## Tooling
 
@@ -69,6 +71,14 @@ Scripts en [`scripts/`](scripts/), PEP 723, ejecutados con `uv run`:
 - `sync_readme.py` — regenera el README público del perfil.
 - `gen_repo_readme.py` — regenera `docs/README.md` (inventario de este repo).
 - `common.py` — módulo compartido de manifests y plantillas; no es un ejecutable.
+- `inventory_sources.py` — metadatos OneDrive y notas existentes; no descarga
+  todo el árbol ni interpreta nombres como prueba de cobertura.
+- `transcription_preflight.py` y `check_transcription.py` — se distribuyen en
+  `.github/transcription/` de las materias; usan GFM + MyST para fórmulas.
+
+`transcription/sources.json` contiene el mapeo de fuentes, separado de
+`data/*.toml` para no mezclarlo con el schema curricular. Los valores `null`
+son pendientes explícitos. No inferir equivalencias entre planes 2008/2023.
 
 `manifest validate` verifica campos, referencias y ciclos. `manifest diff`
 compara solo la carrera y el plan seleccionados; sale con código 1 ante

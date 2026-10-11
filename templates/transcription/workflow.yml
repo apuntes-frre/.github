@@ -1,0 +1,31 @@
+name: Validate Transcription
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  content:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@v3
+        with:
+          working_directory: .github/transcription
+      - name: Verify math preservation and rendering
+        run: mise -C .github/transcription exec -- uv run check.py --self-test
+      - name: Validate changed notes and affected asset references
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          base="$BASE_SHA"
+          if [ -z "$base" ] || [ "$base" = '0000000000000000000000000000000000000000' ]; then
+            base=$(git hash-object -w -t tree /dev/null)
+          fi
+          mise -C .github/transcription exec -- uv run check.py --base "$base"

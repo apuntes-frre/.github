@@ -12,7 +12,8 @@
 """Audita y sincroniza repos de materia desde el manifest curricular.
 
 `inspect` y `manifest list/validate/diff` solo leen. `manifest sync`, `readmes`,
-`contributing`, `gitignore` y `agents` muestran cambios pendientes; `--apply` los publica.
+`contributing`, `gitignore`, `agents` y `bootstrap` muestran cambios pendientes;
+`--apply` los publica.
 """
 
 from __future__ import annotations
@@ -49,6 +50,20 @@ def _client() -> Github:
     if not token:
         raise SystemExit("Falta ORG_ADMIN_TOKEN o GITHUB_TOKEN")
     return Github(auth=Auth.Token(token))
+
+
+@app.command()
+def auth() -> None:
+    """Comprueba el secreto antes de iniciar una sincronización entre repos."""
+    try:
+        client = _client()
+        login = client.get_user().login
+        client.get_organization(ORG_NAME).login
+    except GithubException as exc:
+        if exc.status == 401:
+            raise SystemExit("Credencial inválida/expirada: reemplazar PAT_TOKEN; gh auth local no actualiza secretos de Actions") from exc
+        raise
+    console.print(f"[green]✓ Credencial válida para {login}. La publicación requiere Contents y Workflows: write en {ORG_NAME}.[/]")
 
 
 def _load_manifest(carrera: str) -> dict[str, Any]:
@@ -240,10 +255,9 @@ def manifest_sync(
         )
         return
 
-    agent_content = (ROOT / "templates" / "subject_agents.md").read_text(encoding="utf-8")
     for name in missing:
         repo = org.create_repo(name, description=expected[name], private=private, auto_init=True)
-        _publish_file(repo, "AGENTS.md", agent_content, "chore: sincronizar instrucciones de agentes", apply=True)
+        _bootstrap_repo(repo, apply=True)
         console.print(f"[green]✓ creado {name}[/]")
     for name in drift:
         existing[name].edit(description=expected[name])
@@ -359,6 +373,46 @@ def _publish_shared_file(source: Path, path: str, message: str, apply: bool) -> 
         console.print(f"[yellow]DRY-RUN: {changed} repo(s) a actualizar. Repetí con --apply para publicar {path}.[/]")
     else:
         console.print(f"[green]✓ {path} publicado en {changed} repo(s).[/]")
+
+
+def _bootstrap_repo(repo: Repository, apply: bool) -> int:
+    files = {
+        "AGENTS.md": ROOT / "templates/subject_agents.md",
+        "CONTRIBUTING.md": ROOT / "CONTRIBUTING.md",
+        ".github/transcription/check.py": ROOT / "scripts/check_transcription.py",
+        ".github/transcription/preflight.py": ROOT / "scripts/transcription_preflight.py",
+        ".github/transcription/mise.toml": ROOT / "templates/transcription/mise.toml",
+        ".github/transcription/markdownlint.jsonc": ROOT / "templates/transcription/markdownlint.jsonc",
+        ".github/workflows/transcription.yml": ROOT / "templates/transcription/workflow.yml",
+    }
+    return sum(
+        _publish_file(repo, path, source.read_text(encoding="utf-8"), "chore: preparar transcripcion y validacion", apply)
+        for path, source in files.items()
+    )
+
+
+@app.command()
+def bootstrap(
+    apply: Annotated[bool, typer.Option("--apply", help="Publica instrucciones y validación de transcripciones")] = False,
+) -> None:
+    """Prepara repos de materia existentes; también repara creaciones parciales."""
+    manifests = load_manifests()
+    org = _client().get_organization(ORG_NAME)
+    changed = 0
+    for repo in sorted(org.get_repos(), key=lambda repo: repo.name):
+        parsed = parse_repo_name(repo.name)
+        if repo.archived or parsed is None:
+            continue
+        career, plan, slug = parsed
+        manifest = manifests.get(career)
+        if manifest and slug in manifest["planes"].get(plan, {}).get("materias", {}):
+            changed += _bootstrap_repo(repo, apply)
+    if not changed:
+        console.print("[green]✓ Bootstrap sincronizado; sin escrituras.[/]")
+    elif not apply:
+        console.print(f"[yellow]DRY-RUN: {changed} archivo(s) pendientes. Repetí con --apply.[/]")
+    else:
+        console.print(f"[green]✓ {changed} archivo(s) de bootstrap publicados.[/]")
 
 
 @app.command()

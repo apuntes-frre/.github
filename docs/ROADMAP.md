@@ -61,8 +61,9 @@ publicado 2008 hasta que se decida incorporar el 2023.
 Cargar apuntes en los repos existentes según CONTRIBUTING.md. Crear
 `notes/<año>/`, `study-guides/` y `resources/` cuando haya archivos reales.
 Cada materia recibe las instrucciones Codex de `templates/subject_agents.md`
-al crearla con `manifest sync --apply`. El workflow `subject-agents.yml`
-mantiene las instrucciones y la guía de conversión de las materias existentes.
+al crearla con `manifest sync --apply`, junto con preflight, validador y CI.
+El workflow `subject-agents.yml` mantiene el bootstrap completo; depende de
+un PAT_TOKEN válido con Contents y Workflows: write.
 Las reglas incluyen OneDrive como fuente, herramientas por formato, LaTeX y
 comparación completa con los originales antes de declarar una transcripción lista.
 
@@ -86,3 +87,7 @@ asegura que todos los workflows estén activos o que no haya fallos recientes.
 
 Los apuntes viven en archivos versionados. Este proyecto no administra
 notas, calendarios académicos ni sustituye al campus virtual.
+
+El [flujo de delegación](TRANSCRIPTION.md) separa fuentes pendientes, inventario
+de metadatos, fuentes legibles por hash y revisión documental. CI verifica el
+cambio y las fórmulas, pero no declara una materia completa.

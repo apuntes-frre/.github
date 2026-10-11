@@ -96,18 +96,21 @@ class SyncTests(unittest.TestCase):
         self.repo.edit.assert_not_called()
         extra.edit.assert_not_called()
 
-    def test_new_subjects_receive_agent_instructions_on_creation(self):
+    def test_new_subjects_receive_complete_bootstrap_on_creation(self):
         result = self.runner.invoke(
             sync_repos.app, ["manifest", "sync", "isi", "--apply"]
         )
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(len(self.created_repos), 34)
-        expected = (common.ROOT / "templates" / "subject_agents.md").read_text()
         for repo in self.created_repos:
             with self.subTest(repo=repo.name):
-                repo.create_file.assert_called_once_with(
-                    "AGENTS.md", "chore: sincronizar instrucciones de agentes", expected
-                )
+                files = {call.args[0]: call.args[2] for call in repo.create_file.call_args_list}
+                self.assertEqual(len(files), 7)
+                self.assertEqual(files["AGENTS.md"], (common.ROOT / "templates/subject_agents.md").read_text())
+                self.assertEqual(files["CONTRIBUTING.md"], (common.ROOT / "CONTRIBUTING.md").read_text())
+                self.assertIn(".github/workflows/transcription.yml", files)
+                self.assertIn(".github/transcription/check.py", files)
+                self.assertIn(".github/transcription/preflight.py", files)
         self.repo.create_file.assert_not_called()
         self.repo.update_file.assert_not_called()
 
@@ -130,6 +133,40 @@ class SyncTests(unittest.TestCase):
             repo.get_contents.assert_not_called()
             repo.create_file.assert_not_called()
             repo.update_file.assert_not_called()
+
+    def test_bootstrap_recovers_partial_setup_and_is_idempotent(self):
+        contents = {"AGENTS.md": b"old instructions"}
+        def get_contents(path):
+            if path not in contents:
+                raise GithubException(404, {}, {})
+            return SimpleNamespace(decoded_content=contents[path], sha="sha")
+        def write(path, message, content, *args):
+            contents[path] = content.encode()
+        self.repo.get_contents.side_effect = get_contents
+        self.repo.create_file.side_effect = write
+        self.repo.update_file.side_effect = write
+        dry = self.runner.invoke(sync_repos.app, ["bootstrap"])
+        self.assertEqual(dry.exit_code, 0, dry.output)
+        self.repo.create_file.assert_not_called()
+        self.repo.update_file.assert_not_called()
+        applied = self.runner.invoke(sync_repos.app, ["bootstrap", "--apply"])
+        self.assertEqual(applied.exit_code, 0, applied.output)
+        self.assertEqual(len(contents), 7)
+        self.repo.reset_mock()
+        repeated = self.runner.invoke(sync_repos.app, ["bootstrap", "--apply"])
+        self.assertEqual(repeated.exit_code, 0, repeated.output)
+        self.repo.create_file.assert_not_called()
+        self.repo.update_file.assert_not_called()
+
+    def test_invalid_auth_reports_secret_without_remote_writes(self):
+        client = Mock()
+        client.get_user.side_effect = GithubException(401, {"message": "Bad credentials"}, {})
+        with patch.object(sync_repos, "_client", return_value=client):
+            result = self.runner.invoke(sync_repos.app, ["auth"])
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("PAT_TOKEN", str(result.exception))
+        self.org.create_repo.assert_not_called()
+        self.repo.create_file.assert_not_called()
 
     def test_diff_2023_does_not_report_2008_as_extra(self):
         result = self.runner.invoke(
@@ -188,7 +225,7 @@ class SyncTests(unittest.TestCase):
                 )
 
     def test_publication_propagates_permission_server_and_network_errors(self):
-        for command in ["readmes", "contributing", "gitignore", "agents"]:
+        for command in ["readmes", "contributing", "gitignore", "agents", "bootstrap"]:
             for error in [
                 GithubException(403, {}, {}),
                 GithubException(500, {}, {}),
@@ -304,6 +341,7 @@ class RenderingTests(unittest.TestCase):
     def test_inventory_includes_non_jinja_templates_and_matches_generated_file(self):
         state = gen_repo_readme.collect_state()
         self.assertIn("subject.gitignore", state["templates"])
+        self.assertIn("transcription/workflow.yml", state["templates"])
         self.assertEqual(
             gen_repo_readme.render(state),
             (common.ROOT / "docs" / "README.md").read_text(),

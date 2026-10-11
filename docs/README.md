@@ -32,10 +32,13 @@ Las regresiones se verifican con `uv run tests/test_scripts.py`.
 
 | Script | Propósito |
 | ------ | --------- |
+| `check_transcription.py` | Valida Markdown modificado; la fidelidad se comprueba contra los originales. |
 | `common.py` | Manifest curricular, nombres de repos y plantillas compartidos. |
 | `gen_repo_readme.py` | Regenera docs/README.md a partir del estado real del repo de control `.github`. |
+| `inventory_sources.py` | Inventario de metadatos de OneDrive; no descarga masivamente ni afirma cobertura. |
 | `sync_readme.py` | Regenera profile/README.md a partir del estado vivo de la organización. |
 | `sync_repos.py` | Audita y sincroniza repos de materia desde el manifest curricular. |
+| `transcription_preflight.py` | Comprueba herramientas y materializa fuentes seleccionadas sin alterar originales. |
 
 ## ⚙️ Workflows (`.github/workflows/`)
 
@@ -58,8 +61,12 @@ Las regresiones se verifican con `uv run tests/test_scripts.py`.
 - `subject.gitignore`
 - `subject_agents.md`
 - `subject_readme.md.j2`
+- `transcription/markdownlint.jsonc`
+- `transcription/mise.toml`
+- `transcription/workflow.yml`
 
 ## 📚 Documentación (`docs/`)
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md)
 - [`ROADMAP.md`](ROADMAP.md)
+- [`TRANSCRIPTION.md`](TRANSCRIPTION.md)
