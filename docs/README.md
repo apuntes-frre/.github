@@ -19,7 +19,7 @@ para todos los repos de materia. Detalle en
 ├── docs/                   # documentación de la organización
 ├── profile/                # README público de la organización (autogenerado)
 ├── scripts/                # automatización (PEP 723, `uv run`)
-├── templates/              # plantillas de READMEs y .gitignore
+├── templates/              # plantillas de README, AGENTS y .gitignore
 ├── tests/                  # regresiones sin llamadas a GitHub
 └── .github/workflows/      # CI/CD del repo de control
 ```
@@ -45,6 +45,7 @@ Las regresiones se verifican con `uv run tests/test_scripts.py`.
 | `link-check.yml` — Link Check | schedule, workflow_dispatch, pull_request |
 | `repo-readme.yml` — Update READMEs | push, schedule, workflow_dispatch, repository_dispatch |
 | `repo-sync.yml` — Repository Audit | schedule, workflow_dispatch |
+| `subject-agents.yml` — Synchronize Subject Instructions | push, schedule, workflow_dispatch |
 
 ## 📊 Manifests (`data/`)
 
@@ -55,6 +56,7 @@ Las regresiones se verifican con `uv run tests/test_scripts.py`.
 - `profile_readme.md.j2`
 - `repo_readme.md.j2`
 - `subject.gitignore`
+- `subject_agents.md`
 - `subject_readme.md.j2`
 
 ## 📚 Documentación (`docs/`)

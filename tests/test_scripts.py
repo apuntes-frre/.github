@@ -39,6 +39,15 @@ class SyncTests(unittest.TestCase):
         self.repo = subject_repo()
         self.org = Mock()
         self.org.get_repos.return_value = [self.repo]
+        self.created_repos = []
+
+        def create_repo(name, **kwargs):
+            repo = subject_repo(name)
+            repo.get_contents.side_effect = GithubException(404, {}, {})
+            self.created_repos.append(repo)
+            return repo
+
+        self.org.create_repo.side_effect = create_repo
         client = Mock()
         client.get_organization.return_value = self.org
         self.client_patch = patch.object(sync_repos, "_client", return_value=client)
@@ -87,6 +96,41 @@ class SyncTests(unittest.TestCase):
         self.repo.edit.assert_not_called()
         extra.edit.assert_not_called()
 
+    def test_new_subjects_receive_agent_instructions_on_creation(self):
+        result = self.runner.invoke(
+            sync_repos.app, ["manifest", "sync", "isi", "--apply"]
+        )
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertEqual(len(self.created_repos), 34)
+        expected = (common.ROOT / "templates" / "subject_agents.md").read_text()
+        for repo in self.created_repos:
+            with self.subTest(repo=repo.name):
+                repo.create_file.assert_called_once_with(
+                    "AGENTS.md", "chore: sincronizar instrucciones de agentes", expected
+                )
+        self.repo.create_file.assert_not_called()
+        self.repo.update_file.assert_not_called()
+
+    def test_shared_instructions_skip_archived_unknown_and_control_repos(self):
+        archived = subject_repo("isi-2008-quimica")
+        archived.archived = True
+        ignored = [
+            archived,
+            subject_repo("isi-2008-extra"),
+            subject_repo("isi-1900-fisica-i"),
+            subject_repo("lic-2008-fisica-i"),
+            subject_repo(".github"),
+        ]
+        self.org.get_repos.return_value += ignored
+        self.repo.get_contents.side_effect = GithubException(404, {}, {})
+        result = self.runner.invoke(sync_repos.app, ["agents", "--apply"])
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.repo.create_file.assert_called_once()
+        for repo in ignored:
+            repo.get_contents.assert_not_called()
+            repo.create_file.assert_not_called()
+            repo.update_file.assert_not_called()
+
     def test_diff_2023_does_not_report_2008_as_extra(self):
         result = self.runner.invoke(
             sync_repos.app, ["manifest", "diff", "isi", "--plan", "2023"]
@@ -108,6 +152,7 @@ class SyncTests(unittest.TestCase):
             ("readmes", "README.md"),
             ("contributing", "CONTRIBUTING.md"),
             ("gitignore", ".gitignore"),
+            ("agents", "AGENTS.md"),
         ]:
             with self.subTest(command=command):
                 self.repo.reset_mock()
@@ -143,7 +188,7 @@ class SyncTests(unittest.TestCase):
                 )
 
     def test_publication_propagates_permission_server_and_network_errors(self):
-        for command in ["readmes", "contributing", "gitignore"]:
+        for command in ["readmes", "contributing", "gitignore", "agents"]:
             for error in [
                 GithubException(403, {}, {}),
                 GithubException(500, {}, {}),

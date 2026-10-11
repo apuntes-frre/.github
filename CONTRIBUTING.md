@@ -28,59 +28,87 @@ y abrí un PR con los cambios y su validación.
 - Las carpetas se crean **cuando hay contenido** (no usamos `.gitkeep`).
 - Las imágenes van a `resources/` y se referencian; no se pegan como base64.
 
-## 🛠️ Herramientas (Python, vía `uvx`)
+## 🛠️ Herramientas de conversión
 
-No hace falta instalar nada global: [`uv`](https://docs.astral.sh/uv/) corre cada
-CLI en un entorno efímero con `uvx <herramienta>`.
+Cada repo de materia recibe un `AGENTS.md` con las instrucciones completas
+para Codex: fuente canónica en OneDrive, herramientas, LaTeX y verificación.
+La plantilla común está en `templates/subject_agents.md` del repo de control.
+Las herramientas se seleccionan por formato y se comparan contra la fuente.
 
-| Herramienta | Para qué |
-| ----------- | -------- |
-| `markitdown` | **Tu primera opción.** Conversor universal → Markdown: PDF, DOCX, PPTX, XLSX, HTML, imágenes. |
-| `docling` | PDF con layout/tablas complejas → Markdown (más lento, mejor calidad). |
-| `trafilatura` | Artículos web (URL) → Markdown limpio. |
-| `xlsx2csv` | Planillas XLSX → CSV (cuando solo querés los datos). |
+| Fuente | Ruta inicial |
+| --- | --- |
+| DOCX, ODT, HTML, EPUB | Pandoc → GFM |
+| XLS/XLSX, PPTX | MarkItDown |
+| PDF con texto | PyMuPDF4LLM; comparar con Docling si pierde contenido |
+| PDF científico complejo | Docling, revisando fórmulas y tablas |
+| PDF escaneado o mixto | OCRmyPDF → PyMuPDF4LLM o Docling OCR |
+| DOC, RTF, PPT, ODS | LibreOffice → DOCX/PPTX/XLSX; luego convertir |
+
+En la laptop del propietario, usar las instalaciones de mise con
+`mise exec -- <herramienta> <argumentos>`. `mise run documents:check` verifica
+la base del toolchain; comprobar también Docling, mdformat y markdownlint-cli2.
+En otros hosts, verificar disponibilidad e instalar las herramientas necesarias.
+[`uv`](https://docs.astral.sh/uv/) permite ejecutar herramientas Python con
+`uvx` cuando no hay una instalación administrada disponible.
 
 ## 🔁 Flujo
 
 1. `gh repo clone apuntes-frre/<repo-de-la-materia>`
-2. Convertí la fuente a Markdown (ver abajo).
-3. Ubicá el `.md` en `notes/<año>/{teoria|practica}/`, revisalo.
-4. `commit` + `push` (o abrí un PR si no tenés acceso directo).
+2. Leé `AGENTS.md` e inventariá originales y material existente.
+3. Convertí en un directorio temporal nuevo; preservá la fuente y sus figuras.
+4. Ubicá el `.md` en `notes/<año>/{teoria|practica}/` y verificá su contenido.
+5. Entregá los cambios en una rama de revisión; publicá según la autorización.
 
-> ⚡ **El camino más rápido (Claude Code):** arrastrá la fuente al repo (o pegá el
-> texto/imagen) y pedile a Claude que la transcriba a Markdown siguiendo esta
-> convención. Imbatible con capturas, PDFs escaneados, pizarras y fórmulas, donde
-> los conversores automáticos fallan. Siempre revisá el resultado.
+Los manuscritos, diagramas y fórmulas requieren comparación visual. La salida
+de OCR o de un modelo es una propuesta de transcripción; señalá lo ilegible.
 
 ## Convertir según el formato de origen
 
-### Casi todo → `markitdown`
+### Documentos estructurados → Pandoc; planillas y slides → MarkItDown
 
 ```sh
-uvx markitdown apunte.pdf    -o notes/2026/teoria/<tema>.md
-uvx markitdown apunte.docx   -o notes/2026/teoria/<tema>.md
-uvx markitdown planilla.xlsx -o notes/2026/practica/<tema>.md
+mise exec -- pandoc apunte.docx --to gfm --wrap none \
+  --extract-media apunte.assets --output apunte.md
+mise exec -- markitdown planilla.xlsx --output planilla.md
+mise exec -- markitdown presentacion.pptx --output presentacion.md
 ```
 
-`markitdown` cubre PDF (con texto), DOCX, PPTX, XLSX, HTML e imágenes en un solo
-comando. Empezá siempre por acá.
+Conservá los medios de Pandoc y verificá todas las hojas o diapositivas
+relevantes. Las fórmulas de planillas pueden depender de valores almacenados.
 
-### PDF con tablas/columnas complejas → `docling`
+### PDF → PyMuPDF4LLM o Docling
 
-Si `markitdown` desordena un PDF con layout difícil:
+Para PDF con texto, conservando figuras, encabezados y pies:
 
 ```sh
-uvx docling apunte.pdf --to md
+mise exec -- pymupdf4llm apunte.pdf --out salida-pdf --backend md \
+  --workers 1 --ocr-mode never --write-images --header --footer
 ```
 
-Genera Markdown (mejor reconstrucción de tablas); movés el resultado a
-`notes/<año>/…`.
+Para layout o fórmulas difíciles, compará con Docling y conservá su JSON:
+
+```sh
+mise exec -- docling convert apunte.pdf --to md --to json \
+  --image-export-mode referenced --output salida-docling
+```
+
+Evaluá `--enrich-formula` si hace falta y verificá cada expresión contra la
+fuente. Compará con `pdftotext -layout` y páginas renderizadas con `pdftoppm`.
 
 ### Imágenes / PDF escaneado (capturas, pizarras, fórmulas)
 
-Los conversores **no hacen buen OCR** de manuscritos ni fórmulas. Lo más rápido y
-prolijo: **transcribir con Claude** (visión) a Markdown/LaTeX. La imagen original,
-si aporta, va a `resources/<año>/` y se enlaza desde el `.md`:
+Usá OCRmyPDF sobre una copia y luego la ruta PDF. Verificá antes que Tesseract
+tenga el idioma del original; para español, `spa`:
+
+```sh
+mise exec -- tesseract --list-langs
+mise exec -- ocrmypdf --skip-text --output-type pdf -l spa \
+  escaneado.pdf buscable.pdf
+```
+
+Las capas textuales corruptas y las imágenes en páginas con texto requieren
+inspección adicional. Transcribí las fórmulas a Markdown/LaTeX, preservando
+negaciones y subíndices. La imagen original, si aporta, va a `resources/<año>/`:
 
 ```markdown
 ![Diagrama entidad-relación](../../../resources/2026/der-ventas.png)
@@ -89,7 +117,7 @@ si aporta, va a `resources/<año>/` y se enlaza desde el `.md`:
 ### Google Docs
 
 Descargá el documento como **Markdown (.md)** (*Archivo → Descargar → Markdown*) o
-como `.docx` y pasalo por `uvx markitdown`.
+como `.docx` y pasalo por Pandoc.
 
 ### URL (artículos, apuntes web) → `trafilatura`
 
@@ -113,8 +141,10 @@ derechos de autor: resumí y citá, no copies material protegido completo.
 - [ ] Ubicada en `notes/<año>/{teoria|practica}/` con nombre kebab-case.
 - [ ] Títulos como `#`/`##`, no texto en mayúsculas.
 - [ ] Imágenes en `resources/` y referenciadas (no base64).
-- [ ] Revisada (el OCR y los conversores meten ruido).
-- [ ] `commit` + `push`.
+- [ ] Páginas, ejercicios, tablas, figuras y anexos comparados con la fuente.
+- [ ] Procedencia y SHA-256 registrados en `resources/<año>/fuentes.md`.
+- [ ] Enlaces y LaTeX revisados; formato y lint comprobados.
+- [ ] Rama de revisión lista para publicar según la autorización.
 
 ---
 

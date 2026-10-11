@@ -1,0 +1,40 @@
+name: Synchronize Subject Instructions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'templates/subject_agents.md'
+      - 'CONTRIBUTING.md'
+      - 'scripts/sync_repos.py'
+      - 'scripts/common.py'
+      - 'data/*.toml'
+      - '.github/workflows/subject-agents.yml'
+  schedule:
+    - cron: '0 5 * * *' # Detecta materias creadas fuera del script, diariamente.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: subject-instructions
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      ORG_ADMIN_TOKEN: ${{ secrets.PAT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: 'scripts/sync_repos.py'
+      - name: Synchronize agent instructions
+        run: uv run scripts/sync_repos.py agents --apply
+      - name: Synchronize conversion guide
+        run: uv run scripts/sync_repos.py contributing --apply
