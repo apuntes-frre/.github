@@ -49,9 +49,17 @@ isi-2008-<slug>/
 Convención de archivos: `nombre-tema.md`, `guia-estudio-tema.md`, imágenes
 `nombre-tema-descripcion.png`.
 
-Cómo cargar apuntes (conversión por formato, herramientas Python vía `uvx`,
+Cómo cargar apuntes (conversión por formato, herramientas vía mise,
 flujo de trabajo): ver [`CONTRIBUTING.md`](CONTRIBUTING.md). Se publica en cada
 repo de materia con `uv run scripts/sync_repos.py contributing --apply`.
+
+Las instrucciones Codex de las materias provienen de
+[`templates/subject_agents.md`](templates/subject_agents.md). `manifest sync
+--apply` instala `AGENTS.md` al crear cada repo; `uv run scripts/sync_repos.py
+agents --apply` sincroniza los repos existentes declarados en el manifest.
+El workflow `subject-agents.yml` publica esa plantilla y CONTRIBUTING al cambiar
+sus fuentes en main, diariamente o por dispatch. Usa el secreto `PAT_TOKEN`
+con permisos de escritura sobre los repos de materia.
 
 ## Tooling
 

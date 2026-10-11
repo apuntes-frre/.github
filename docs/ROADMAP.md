@@ -60,6 +60,11 @@ publicado 2008 hasta que se decida incorporar el 2023.
 
 Cargar apuntes en los repos existentes según CONTRIBUTING.md. Crear
 `notes/<año>/`, `study-guides/` y `resources/` cuando haya archivos reales.
+Cada materia recibe las instrucciones Codex de `templates/subject_agents.md`
+al crearla con `manifest sync --apply`. El workflow `subject-agents.yml`
+mantiene las instrucciones y la guía de conversión de las materias existentes.
+Las reglas incluyen OneDrive como fuente, herramientas por formato, LaTeX y
+comparación completa con los originales antes de declarar una transcripción lista.
 
 ### Otras carreras
 

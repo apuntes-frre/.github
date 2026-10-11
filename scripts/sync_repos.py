@@ -12,7 +12,7 @@
 """Audita y sincroniza repos de materia desde el manifest curricular.
 
 `inspect` y `manifest list/validate/diff` solo leen. `manifest sync`, `readmes`,
-`contributing` y `gitignore` muestran cambios pendientes; `--apply` los publica.
+`contributing`, `gitignore` y `agents` muestran cambios pendientes; `--apply` los publica.
 """
 
 from __future__ import annotations
@@ -240,8 +240,10 @@ def manifest_sync(
         )
         return
 
+    agent_content = (ROOT / "templates" / "subject_agents.md").read_text(encoding="utf-8")
     for name in missing:
-        org.create_repo(name, description=expected[name], private=private, auto_init=True)
+        repo = org.create_repo(name, description=expected[name], private=private, auto_init=True)
+        _publish_file(repo, "AGENTS.md", agent_content, "chore: sincronizar instrucciones de agentes", apply=True)
         console.print(f"[green]✓ creado {name}[/]")
     for name in drift:
         existing[name].edit(description=expected[name])
@@ -373,6 +375,14 @@ def gitignore(
 ) -> None:
     """Publica templates/subject.gitignore en los repos declarados en el manifest."""
     _publish_shared_file(ROOT / "templates" / "subject.gitignore", ".gitignore", "chore: sincronizar .gitignore", apply)
+
+
+@app.command()
+def agents(
+    apply: Annotated[bool, typer.Option("--apply", help="Publica el AGENTS.md")] = False,
+) -> None:
+    """Publica las instrucciones de transcripción en los repos de materia."""
+    _publish_shared_file(ROOT / "templates" / "subject_agents.md", "AGENTS.md", "chore: sincronizar instrucciones de agentes", apply)
 
 
 if __name__ == "__main__":

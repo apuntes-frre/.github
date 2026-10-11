@@ -18,7 +18,8 @@ se producían cuando la plantilla incluía la fecha actual.
 Sincronización de READMEs
 ------------------------
 repo-readme.yml regenera el perfil y el inventario en un solo commit.
-Los archivos de los repos de materia se publican manualmente con --apply.
+Los READMEs de materia se publican manualmente con --apply.
+subject-agents.yml sincroniza sus instrucciones Codex y CONTRIBUTING.
 
 Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
 
