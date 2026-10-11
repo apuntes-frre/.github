@@ -68,15 +68,18 @@ uv run scripts/sync_repos.py readmes isi --plan 2008
 uv run scripts/sync_repos.py contributing
 uv run scripts/sync_repos.py gitignore
 uv run scripts/sync_repos.py agents
+uv run scripts/sync_repos.py auth
+uv run scripts/sync_repos.py bootstrap
 ```
 
 El índice y los comandos `manifest list`, `validate` y `diff` solo leen. `manifest diff` sale con código 1
 ante repos faltantes, sobrantes o descripciones diferentes.
-`manifest sync`, `readmes`, `contributing`, `gitignore` y `agents` son dry-run por
+`manifest sync`, `readmes`, `contributing`, `gitignore`, `agents` y `bootstrap` son dry-run por
 defecto; agregar `--apply` para publicar. `manifest sync --archive --apply`
 solo puede archivar sobrantes de la carrera y el plan seleccionados.
-Al crear una materia, `manifest sync --apply` instala `AGENTS.md` desde la
-plantilla compartida. `agents` permite revisar o actualizar las instrucciones
+Al crear una materia, `manifest sync --apply` instala AGENTS, CONTRIBUTING,
+preflight, validador y CI desde las fuentes compartidas. `bootstrap` sincroniza
+el conjunto y repara instalaciones parciales. `agents` permite revisar las instrucciones
 en todos los repos activos declarados en los manifests, sin crear repos nuevos.
 
 La publicación de archivos usa una sola implementación: leer, comparar y
@@ -98,7 +101,7 @@ El orden es estable y la fecha cambia con la actividad de contenido.
 | `check.yml` | PR y push a main de scripts, tests, manifests, templates o workflows | Regresiones sin llamadas a GitHub y validación de workflows. |
 | `repo-readme.yml` | Cambios de fuentes en main, semanal, dispatch y `subject-repo-updated` | Regenera perfil e inventario; publica ambos en un solo commit cuando hay diferencias. |
 | `repo-sync.yml` | Mensual y dispatch | Valida todos los planes y compara el plan publicado 2008 con GitHub. Solo lectura, sin clones. |
-| `subject-agents.yml` | Cambios de plantilla, guía, manifest o publicador en main, diario y dispatch | Sincroniza AGENTS.md y CONTRIBUTING en las materias existentes declaradas. |
+| `subject-agents.yml` | Cambios de plantilla, guía, manifest o publicador en main, diario y dispatch | Valida la credencial y sincroniza instrucciones, preflight, validador y CI en materias declaradas. |
 | `link-check.yml` | PR de Markdown, semanal y dispatch | Falla ante enlaces rotos; en ejecuciones programadas crea o actualiza un único issue abierto. |
 | `dependabot.yml` | Semanal | Propone actualizaciones agrupadas de GitHub Actions. |
 
@@ -112,7 +115,8 @@ necesita `contents: write` en el control. El chequeo de enlaces necesita
 repos de materia requieren `ORG_ADMIN_TOKEN` o `GITHUB_TOKEN` con los permisos
 correspondientes. No se almacena ningún token en archivos del repositorio.
 `subject-agents.yml` utiliza el secreto existente `PAT_TOKEN`, expuesto al script
-como `ORG_ADMIN_TOKEN`; necesita escritura sobre los repos de materia.
+como `ORG_ADMIN_TOKEN`; necesita Contents y Workflows: write sobre los repos
+de materia. La CLI autenticada no reemplaza automáticamente ese secreto.
 Solo publica desde main. La creación por el script instala las instrucciones
 inmediatamente; una materia declarada y creada por otro medio recibe los
 archivos en la siguiente ejecución diaria o manual del workflow.
@@ -138,3 +142,7 @@ Para agregar una carrera, incorporar `data/<carrera>.toml`; no hay una lista
 paralela de prefijos. Para publicar otro plan, crearlo manualmente con
 `manifest sync --plan <año> --apply` y agregarlo explícitamente a la auditoría
 solo cuando deba existir en GitHub. El plan 2023 aún no se publica automáticamente.
+
+El [flujo de transcripción](TRANSCRIPTION.md) describe el mapeo OneDrive separado
+del manifest curricular, materialización por SHA-256, preservación matemática y
+validación limitada a archivos modificados y referencias a medios eliminados.

@@ -71,7 +71,7 @@ def collect_state() -> dict[str, Any]:
         _workflow_info(p) for p in sorted((ROOT / ".github" / "workflows").glob("*.yml"))
     ]
     data_files = [p.name for p in sorted((ROOT / "data").glob("*.toml"))]
-    templates = [p.name for p in sorted((ROOT / "templates").iterdir()) if p.is_file()]
+    templates = [str(p.relative_to(ROOT / "templates")) for p in sorted((ROOT / "templates").rglob("*")) if p.is_file()]
     docs = [
         p.name for p in sorted((ROOT / "docs").glob("*.md")) if p.name != "README.md"
     ]

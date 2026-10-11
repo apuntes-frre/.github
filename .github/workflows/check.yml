@@ -7,6 +7,7 @@ on:
       - 'tests/**'
       - 'templates/**'
       - 'data/*.toml'
+      - 'transcription/**'
       - '.github/workflows/**'
   push:
     branches: [main]
@@ -15,6 +16,7 @@ on:
       - 'tests/**'
       - 'templates/**'
       - 'data/*.toml'
+      - 'transcription/**'
       - '.github/workflows/**'
 
 permissions:
@@ -32,5 +34,12 @@ jobs:
           cache-dependency-glob: 'tests/test_scripts.py'
       - name: Run regressions without GitHub access
         run: uv run tests/test_scripts.py
+      - uses: jdx/mise-action@v3
+        with:
+          working_directory: templates/transcription
+      - name: Check transcription regressions and math rendering
+        run: |
+          mise -C templates/transcription exec -- uv run ../../tests/test_transcription.py
+          mise -C templates/transcription exec -- uv run ../../scripts/check_transcription.py --self-test
       - name: Validate workflows
-        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+        run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 .github/workflows/*.yml templates/transcription/workflow.yml
