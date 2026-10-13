@@ -53,6 +53,9 @@ class SyncTests(unittest.TestCase):
         self.client_patch = patch.object(sync_repos, "_client", return_value=client)
         self.client_patch.start()
         self.addCleanup(self.client_patch.stop)
+        self.env_patch = patch.dict(os.environ, {"GITHUB_ACTIONS": "false"})
+        self.env_patch.start()
+        self.addCleanup(self.env_patch.stop)
         self.runner = CliRunner()
 
     def test_sync_2023_never_archives_2008(self):
@@ -158,15 +161,84 @@ class SyncTests(unittest.TestCase):
         self.repo.create_file.assert_not_called()
         self.repo.update_file.assert_not_called()
 
-    def test_invalid_auth_reports_secret_without_remote_writes(self):
+    def test_invalid_auth_reports_gh_login_without_remote_writes(self):
         client = Mock()
         client.get_user.side_effect = GithubException(401, {"message": "Bad credentials"}, {})
         with patch.object(sync_repos, "_client", return_value=client):
             result = self.runner.invoke(sync_repos.app, ["auth"])
         self.assertNotEqual(result.exit_code, 0)
-        self.assertIn("PAT_TOKEN", str(result.exception))
+        self.assertIn("gh auth login", str(result.exception))
         self.org.create_repo.assert_not_called()
         self.repo.create_file.assert_not_called()
+
+    def test_default_sync_publishes_existing_subjects_and_is_idempotent(self):
+        other_plan = subject_repo("isi-2023-fisica-i")
+        archived = subject_repo("isi-2008-quimica")
+        archived.archived = True
+        ignored = [
+            archived,
+            subject_repo("isi-2008-extra"),
+            subject_repo("lic-2008-fisica-i"),
+            subject_repo(".github"),
+        ]
+        self.org.get_repos.return_value += [other_plan, *ignored]
+        for repo in (self.repo, other_plan):
+            contents = {".gitignore": b"custom ignore rules"}
+            def get_contents(path, contents=contents):
+                if path not in contents:
+                    raise GithubException(404, {}, {})
+                return SimpleNamespace(decoded_content=contents[path], sha="sha")
+            def write(path, message, content, *args, contents=contents):
+                contents[path] = content.encode()
+            repo.get_contents.side_effect = get_contents
+            repo.create_file.side_effect = write
+            repo.update_file.side_effect = write
+        first = self.runner.invoke(sync_repos.app, [])
+        self.assertEqual(first.exit_code, 0, first.output)
+        self.assertIn("2 materia(s)", first.output)
+        for repo in (self.repo, other_plan):
+            self.assertEqual(repo.create_file.call_count, 8)
+            self.assertNotIn(
+                ".gitignore", [c.args[0] for c in repo.get_contents.call_args_list]
+            )
+            repo.reset_mock()
+        second = self.runner.invoke(sync_repos.app, [])
+        self.assertEqual(second.exit_code, 0, second.output)
+        self.assertIn("sin escrituras", second.output)
+        self.org.create_repo.assert_not_called()
+        for repo in (self.repo, other_plan, *ignored):
+            repo.create_file.assert_not_called()
+            repo.update_file.assert_not_called()
+            repo.edit.assert_not_called()
+        for repo in ignored:
+            repo.get_contents.assert_not_called()
+
+    def test_default_sync_auth_failure_stops_before_publication(self):
+        client = Mock()
+        client.get_user.side_effect = GithubException(401, {}, {})
+        with patch.object(sync_repos, "_client", return_value=client):
+            result = self.runner.invoke(sync_repos.app, [])
+        self.assertNotEqual(result.exit_code, 0)
+        self.repo.get_contents.assert_not_called()
+        self.org.create_repo.assert_not_called()
+
+    def test_default_sync_rejects_invalid_manifest_before_github_access(self):
+        with (
+            patch.object(sync_repos, "load_manifests", side_effect=ValueError("invalid manifest")),
+            patch.object(sync_repos, "_client") as client,
+        ):
+            result = self.runner.invoke(sync_repos.app, [])
+        self.assertNotEqual(result.exit_code, 0)
+        client.assert_not_called()
+
+    def test_default_sync_is_local_only_but_readonly_audit_still_works_in_ci(self):
+        with patch.dict(os.environ, {"GITHUB_ACTIONS": "true"}):
+            result = self.runner.invoke(sync_repos.app, [])
+            self.assertNotEqual(result.exit_code, 0)
+            self.assertIn("solo local", str(result.exception))
+            readonly = self.runner.invoke(sync_repos.app, ["manifest", "validate", "isi"])
+            self.assertEqual(readonly.exit_code, 0, readonly.output)
+        self.repo.get_contents.assert_not_called()
 
     def test_diff_2023_does_not_report_2008_as_extra(self):
         result = self.runner.invoke(
@@ -282,6 +354,52 @@ class SyncTests(unittest.TestCase):
         self.assertEqual(result.exit_code, 1)
         self.assertIn("Descripciones diferentes", result.output)
         self.assertNotIn(archived.name, result.output)
+
+
+class CredentialTests(unittest.TestCase):
+    def test_local_login_obtains_credential_from_gh(self):
+        env = {"GITHUB_ACTIONS": "false", "ORG_ADMIN_TOKEN": "old-token", "GITHUB_TOKEN": "old-token"}
+        with (
+            patch.dict(os.environ, env),
+            patch.object(sync_repos.subprocess, "run", return_value=SimpleNamespace(stdout="gh-credential\n")) as command,
+            patch.object(sync_repos.Auth, "Token") as auth,
+            patch.object(sync_repos, "Github") as github,
+        ):
+            sync_repos._client()
+        command.assert_called_once_with(
+            ["gh", "auth", "token", "--hostname", "github.com"],
+            capture_output=True, text=True, check=True,
+        )
+        auth.assert_called_once_with("gh-credential")
+        github.assert_called_once_with(auth=auth.return_value)
+
+    def test_missing_or_failed_gh_login_has_actionable_error_without_credentials(self):
+        for error in (
+            FileNotFoundError(),
+            subprocess.CalledProcessError(1, ["gh"], output="private-token", stderr="private-token"),
+        ):
+            with (
+                self.subTest(error=type(error).__name__),
+                patch.dict(os.environ, {"GITHUB_ACTIONS": "false"}),
+                patch.object(sync_repos.subprocess, "run", side_effect=error),
+                patch.object(sync_repos, "Github") as github,
+            ):
+                with self.assertRaises(SystemExit) as result:
+                    sync_repos._client()
+                self.assertIn("gh auth login", str(result.exception))
+                self.assertNotIn("private-token", str(result.exception))
+                github.assert_not_called()
+
+    def test_readonly_ci_auth_uses_builtin_token_without_gh(self):
+        with (
+            patch.dict(os.environ, {"GITHUB_ACTIONS": "true", "GITHUB_TOKEN": "builtin-token"}),
+            patch.object(sync_repos.subprocess, "run") as command,
+            patch.object(sync_repos.Auth, "Token") as auth,
+            patch.object(sync_repos, "Github"),
+        ):
+            sync_repos._client()
+        command.assert_not_called()
+        auth.assert_called_once_with("builtin-token")
 
 
 class ManifestTests(unittest.TestCase):

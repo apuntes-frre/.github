@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Local-only synchronization: run with uv and the existing GitHub CLI login.
+# Credentials stay in memory; no Actions PAT or environment setup is required.
 # /// script
 # requires-python = ">=3.12"
 # dependencies = [
@@ -9,8 +11,10 @@
 # ]
 # ///
 
-"""Audita y sincroniza repos de materia desde el manifest curricular.
+"""Audita y sincroniza localmente repos de materia desde el manifest curricular.
 
+Sin argumentos, usa la sesión de gh y publica el bootstrap y los READMEs en
+las materias existentes declaradas. No crea repos ni reemplaza .gitignore.
 `inspect` y `manifest list/validate/diff` solo leen. `manifest sync`, `readmes`,
 `contributing`, `gitignore`, `agents` y `bootstrap` muestran cambios pendientes;
 `--apply` los publica.
@@ -19,6 +23,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import sys
 from pathlib import Path
 from typing import Annotated, Any
@@ -42,28 +47,70 @@ else:
     )
 
 console = Console()
-app = typer.Typer(add_completion=False, no_args_is_help=True)
+app = typer.Typer(add_completion=False, no_args_is_help=False)
 
 
 def _client() -> Github:
-    token = os.getenv("ORG_ADMIN_TOKEN") or os.getenv("GITHUB_TOKEN")
+    # La auditoría de CI conserva el token integrado de GitHub, sin PAT.
+    token = os.getenv("GITHUB_TOKEN") if os.getenv("GITHUB_ACTIONS") == "true" else None
     if not token:
-        raise SystemExit("Falta ORG_ADMIN_TOKEN o GITHUB_TOKEN")
+        try:
+            result = subprocess.run(
+                ["gh", "auth", "token", "--hostname", "github.com"],
+                capture_output=True, text=True, check=True,
+            )
+        except FileNotFoundError:
+            raise SystemExit("Falta GitHub CLI (gh); instalarlo e iniciar sesión con gh auth login.") from None
+        except subprocess.CalledProcessError:
+            raise SystemExit("No hay una sesión de gh válida; ejecutar gh auth login --hostname github.com.") from None
+        token = result.stdout.strip()
+        if not token:
+            raise SystemExit("No hay una sesión de gh válida; ejecutar gh auth login --hostname github.com.")
     return Github(auth=Auth.Token(token))
 
 
 @app.command()
 def auth() -> None:
-    """Comprueba el secreto antes de iniciar una sincronización entre repos."""
+    """Comprueba la credencial antes de iniciar una sincronización entre repos."""
     try:
         client = _client()
         login = client.get_user().login
         client.get_organization(ORG_NAME).login
     except GithubException as exc:
         if exc.status == 401:
-            raise SystemExit("Credencial inválida/expirada: reemplazar PAT_TOKEN; gh auth local no actualiza secretos de Actions") from exc
+            raise SystemExit("Credencial inválida/expirada; renovar la sesión con gh auth login --hostname github.com.") from exc
         raise
     console.print(f"[green]✓ Credencial válida para {login}. La publicación requiere Contents y Workflows: write en {ORG_NAME}.[/]")
+
+
+@app.callback(invoke_without_command=True)
+def sync_local(ctx: typer.Context) -> None:
+    """Sin argumentos, sincroniza las materias existentes usando la sesión local de gh."""
+    if ctx.invoked_subcommand is not None:
+        return
+    if os.getenv("GITHUB_ACTIONS") == "true":
+        raise SystemExit("La sincronización predeterminada es solo local; ejecutar uv run scripts/sync_repos.py en la laptop.")
+    manifests = load_manifests()
+    auth()
+    org = _client().get_organization(ORG_NAME)
+    template = template_environment().get_template("subject_readme.md.j2")
+    changed = subjects = 0
+    for repo in sorted(org.get_repos(), key=lambda repo: repo.name):
+        parsed = parse_repo_name(repo.name)
+        if repo.archived or parsed is None:
+            continue
+        career, plan, slug = parsed
+        manifest = manifests.get(career)
+        if manifest is None or slug not in manifest["planes"].get(plan, {}).get("materias", {}):
+            continue
+        changed += _bootstrap_repo(repo, apply=True)
+        changed += _publish_file(
+            repo, "README.md", _render_subject_readme(manifest, plan, slug, template),
+            "docs: sincronizar README desde manifest", apply=True,
+        )
+        subjects += 1
+    result = f"{changed} archivo(s) publicados" if changed else "sin escrituras"
+    console.print(f"[green]✓ Sincronización local: {subjects} materia(s); {result}.[/]")
 
 
 def _load_manifest(carrera: str) -> dict[str, Any]:
