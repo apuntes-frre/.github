@@ -63,15 +63,11 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 - 📁 [`isi-2008-algebra-y-geometria-analitica`](https://github.com/apuntes-frre/isi-2008-algebra-y-geometria-analitica) — **Álgebra y Geometría Analítica**
 </details>
 
-## 🔄 Actualizaciones recientes
-
-- `2026-05-27` · **isi-2008-arquitectura-de-computadoras** — docs: transcribir guia de Assembler (07) y prefijar guias de practica
-- `2026-05-23` · **isi-2008-gestion-de-datos** — refactor: rename generador-de-tablas.py to csv-generator.py
 
 ---
 
 <sub>
-🗓 Última actualización: 2026-05-27 ·
+🗓 Última actualización: — ·
 📚 35 materias ·
 🎓 1 carrera ·
 📆 1 plan
