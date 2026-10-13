@@ -62,8 +62,9 @@ Cargar apuntes en los repos existentes según CONTRIBUTING.md. Crear
 `notes/<año>/`, `study-guides/` y `resources/` cuando haya archivos reales.
 Cada materia recibe las instrucciones Codex de `templates/subject_agents.md`
 al crearla con `manifest sync --apply`, junto con preflight, validador y CI.
-El workflow `subject-agents.yml` mantiene el bootstrap completo; depende de
-un PAT_TOKEN válido con Contents y Workflows: write.
+El comando local `uv run scripts/sync_repos.py` mantiene el bootstrap completo
+y los READMEs con la sesión de `gh`, sin PAT ni secretos de Actions. Ejecutarlo
+después de cambiar las plantillas o crear una materia por otro medio.
 Las reglas incluyen OneDrive como fuente, herramientas por formato, LaTeX y
 comparación completa con los originales antes de declarar una transcripción lista.
 

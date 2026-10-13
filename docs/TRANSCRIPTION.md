@@ -8,48 +8,34 @@ su `AGENTS.md`.
 ## Preparación de la organización
 
 ```sh
-uv run scripts/sync_repos.py auth
-uv run scripts/sync_repos.py bootstrap
-uv run scripts/sync_repos.py bootstrap --apply
-uv run scripts/sync_repos.py bootstrap --apply
+uv run scripts/sync_repos.py
 ```
 
-La segunda aplicación debe informar cero escrituras. Se distribuyen AGENTS,
-CONTRIBUTING, preflight, validador, configuración mise/lint y el workflow
-`Validate Transcription`. `manifest sync --apply` instala los mismos archivos al
-crear una materia; bootstrap repara instalaciones parciales.
+Es una sincronización local que usa la sesión existente de GitHub CLI (`gh`).
+Valida los manifests y la credencial, y publica AGENTS, CONTRIBUTING, preflight,
+validador, configuración mise/lint, el workflow `Validate Transcription` y los
+READMEs generados en las materias existentes declaradas. No crea ni archiva
+repos, no cambia `.gitignore` y no actualiza clones locales.
 
-### Credencial para Actions
+Repetir el mismo comando debe informar «sin escrituras». Los subcomandos
+existentes conservan su dry-run, por ejemplo `bootstrap` y `readmes`; agregar
+`--apply` para publicarlos por separado. `manifest sync --apply` instala el
+bootstrap al crear una materia; el comando sin argumentos también repara
+instalaciones parciales. Ejecutarlo al cambiar plantillas o agregar una materia
+por otro medio.
 
-La sesión autenticada de `gh` y el secreto de Actions son credenciales
-distintas. `PAT_TOKEN` vencido produce HTTP 401 aunque `gh auth status`
-funcione. El workflow comprueba el secreto antes de publicar; todavía requiere
-permisos de escritura.
+### Credencial local
 
-Crear un token fine-grained dedicado con propietario `apuntes-frre`, acceso a
-**All repositories** para cubrir futuras materias, **Contents: Read and write**,
-**Workflows: Read and write** y Metadata de lectura. No necesita permisos de
-administración o borrado: el workflow sincroniza archivos, no crea repos. Los
-permisos están documentados en la
-[API Contents de GitHub](https://docs.github.com/en/rest/repos/contents#create-or-update-file-contents).
+No requiere PAT ni secretos de Actions. `gh` debe estar instalado y autenticado
+con acceso de escritura a las materias y permiso para publicar workflows. Si
+falta la sesión, ejecutar `gh auth login --hostname github.com`; para agregar
+los scopes OAuth necesarios, usar
+`gh auth refresh --hostname github.com --scopes repo,workflow`.
 
-GitHub permite
-[prellenar el formulario](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#pre-filling-fine-grained-personal-access-token-details-using-url-parameters),
-pero la creación se realiza en ajustes de la cuenta. No guardar el token OAuth
-amplio de la CLI como sustituto permanente del token dedicado.
-
-Tras generar el token, ingresarlo en el prompt oculto de:
-
-```sh
-gh secret set PAT_TOKEN --repo apuntes-frre/.github
-gh workflow run subject-agents.yml --repo apuntes-frre/.github --ref main
-gh run list --repo apuntes-frre/.github --workflow subject-agents.yml --limit 1
-```
-
-No pegar credenciales en chats, argumentos de comandos o archivos versionados.
-Revisar logs y repetir el workflow para probar idempotencia. Renovar el token
-antes de su expiración; `gh` puede almacenar el secreto, pero no crear un token
-fine-grained mediante una operación CLI.
+El script obtiene la credencial con `gh auth token` y la mantiene en memoria; no
+exportarla ni copiarla a archivos o secretos. La auditoría de solo lectura en
+Actions conserva el `GITHUB_TOKEN` integrado de GitHub. La publicación de
+archivos de materias se ejecuta desde la laptop.
 
 ## Inventario y asignación
 

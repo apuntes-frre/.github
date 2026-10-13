@@ -19,9 +19,9 @@ Sincronización de READMEs
 ------------------------
 repo-readme.yml regenera el perfil y el inventario en un solo commit.
 Los READMEs de materia se publican manualmente con --apply.
-subject-agents.yml sincroniza sus instrucciones Codex y CONTRIBUTING.
+sync_repos.py sin argumentos sincroniza localmente el bootstrap y los READMEs.
 
-Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
+Token para el generador del perfil: tu cuenta ya tiene acceso, así que
 
     export GITHUB_TOKEN="$(gh auth token)"
 
@@ -31,7 +31,7 @@ Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
        uv run scripts/sync_readme.py
 
 2. README de CADA REPO DE MATERIA  ->  <repo>/README.md
-   Fuente: data/<carrera>.toml. Requiere token con acceso de escritura a la org.
+   Fuente: data/<carrera>.toml. Usa la sesión de gh con escritura en la org.
    Correrlo solo tras editar el manifest o templates/subject_readme.md.j2.
 
        uv run scripts/sync_repos.py readmes isi --plan 2008            # dry-run
@@ -43,14 +43,14 @@ Token (solo para los que tocan la org): tu cuenta ya tiene acceso, así que
        uv run scripts/gen_repo_readme.py
 
 4. CONTRIBUTING de cada repo de materia  ->  <repo>/CONTRIBUTING.md
-   Fuente: CONTRIBUTING.md (raíz de este repo). Requiere token de escritura.
+   Fuente: CONTRIBUTING.md (raíz de este repo). Usa la sesión de gh con escritura.
    Correrlo tras editar el CONTRIBUTING.md de la raíz.
 
        uv run scripts/sync_repos.py contributing            # dry-run
        uv run scripts/sync_repos.py contributing --apply    # publica
 
 5. .gitignore de cada repo de materia  ->  <repo>/.gitignore
-   Fuente: templates/subject.gitignore. Requiere token de escritura.
+   Fuente: templates/subject.gitignore. Usa la sesión de gh con escritura.
 
        uv run scripts/sync_repos.py gitignore            # dry-run
        uv run scripts/sync_repos.py gitignore --apply    # publica

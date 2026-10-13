@@ -37,7 +37,7 @@ Las regresiones se verifican con `uv run tests/test_scripts.py`.
 | `gen_repo_readme.py` | Regenera docs/README.md a partir del estado real del repo de control `.github`. |
 | `inventory_sources.py` | Inventario de metadatos de OneDrive; no descarga masivamente ni afirma cobertura. |
 | `sync_readme.py` | Regenera profile/README.md a partir del estado vivo de la organización. |
-| `sync_repos.py` | Audita y sincroniza repos de materia desde el manifest curricular. |
+| `sync_repos.py` | Audita y sincroniza localmente repos de materia desde el manifest curricular. |
 | `transcription_preflight.py` | Comprueba herramientas y materializa fuentes seleccionadas sin alterar originales. |
 
 ## ⚙️ Workflows (`.github/workflows/`)
@@ -48,7 +48,6 @@ Las regresiones se verifican con `uv run tests/test_scripts.py`.
 | `link-check.yml` — Link Check | schedule, workflow_dispatch, pull_request |
 | `repo-readme.yml` — Update READMEs | push, schedule, workflow_dispatch, repository_dispatch |
 | `repo-sync.yml` — Repository Audit | schedule, workflow_dispatch |
-| `subject-agents.yml` — Synchronize Subject Instructions | push, schedule, workflow_dispatch |
 
 ## 📊 Manifests (`data/`)
 

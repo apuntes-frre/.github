@@ -59,9 +59,11 @@ Las instrucciones Codex de las materias provienen de
 agents --apply` sincroniza solo esa plantilla. `bootstrap --apply` sincroniza
 AGENTS, CONTRIBUTING, preflight, validador, configuración y CI. La creación
 instala el bootstrap completo; repetirlo repara una creación parcial.
-El workflow `subject-agents.yml` publica el conjunto al cambiar sus fuentes
-en main, diariamente o por dispatch. `PAT_TOKEN` requiere Contents y Workflows:
-write en la org. Ejecutar `auth` primero y seguir [el flujo](docs/TRANSCRIPTION.md).
+Ejecutar localmente `uv run scripts/sync_repos.py` después de cambiar esas fuentes
+o crear una materia fuera del script. Sin argumentos, usa la sesión autenticada
+de `gh`, valida los manifests y publica el bootstrap y los READMEs en las materias
+existentes declaradas. No requiere secretos de Actions ni variables de entorno.
+Seguir [el flujo](docs/TRANSCRIPTION.md).
 
 ## Tooling
 
@@ -87,4 +89,6 @@ Las correlativas del plan 2023 están pendientes: no inferir que no hay requisit
 
 Para verificar cambios sin acceder a GitHub: `uv run tests/test_scripts.py`.
 
-Los que escriben en la org soportan dry-run; agregar `--apply` para ejecutar.
+Los subcomandos de publicación soportan dry-run; agregar `--apply` para ejecutar.
+El comando sin argumentos publica directamente el bootstrap y los READMEs;
+no crea ni archiva repos y conserva las personalizaciones de `.gitignore`.

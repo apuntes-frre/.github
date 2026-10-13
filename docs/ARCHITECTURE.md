@@ -60,6 +60,7 @@ instalable ni `requirements.txt`. Python mínimo: 3.12.
 
 ```sh
 uv run python -m scripts
+uv run scripts/sync_repos.py
 uv run scripts/sync_repos.py manifest list isi --plan 2008
 uv run scripts/sync_repos.py manifest validate isi
 uv run scripts/sync_repos.py manifest diff isi --plan 2008
@@ -71,6 +72,11 @@ uv run scripts/sync_repos.py agents
 uv run scripts/sync_repos.py auth
 uv run scripts/sync_repos.py bootstrap
 ```
+
+Sin argumentos, `sync_repos.py` usa la sesión de `gh`, valida los manifests y
+publica el bootstrap y los READMEs de las materias existentes declaradas. Se
+ejecuta localmente; no crea ni archiva repos, no modifica `.gitignore` ni
+actualiza clones. Una segunda ejecución debe informar cero escrituras.
 
 El índice y los comandos `manifest list`, `validate` y `diff` solo leen. `manifest diff` sale con código 1
 ante repos faltantes, sobrantes o descripciones diferentes.
@@ -101,7 +107,6 @@ El orden es estable y la fecha cambia con la actividad de contenido.
 | `check.yml` | PR y push a main de scripts, tests, manifests, templates o workflows | Regresiones sin llamadas a GitHub y validación de workflows. |
 | `repo-readme.yml` | Cambios de fuentes en main, semanal, dispatch y `subject-repo-updated` | Regenera perfil e inventario; publica ambos en un solo commit cuando hay diferencias. |
 | `repo-sync.yml` | Mensual y dispatch | Valida todos los planes y compara el plan publicado 2008 con GitHub. Solo lectura, sin clones. |
-| `subject-agents.yml` | Cambios de plantilla, guía, manifest o publicador en main, diario y dispatch | Valida la credencial y sincroniza instrucciones, preflight, validador y CI en materias declaradas. |
 | `link-check.yml` | PR de Markdown, semanal y dispatch | Falla ante enlaces rotos; en ejecuciones programadas crea o actualiza un único issue abierto. |
 | `dependabot.yml` | Semanal | Propone actualizaciones agrupadas de GitHub Actions. |
 
@@ -112,14 +117,12 @@ si hay conflicto, falla para revisión. Un dispatch desde otra rama no hace push
 El token de CI tiene `contents: read` en auditoría y checks; el generador
 necesita `contents: write` en el control. El chequeo de enlaces necesita
 `issues: write` para reportes programados. Las operaciones manuales sobre
-repos de materia requieren `ORG_ADMIN_TOKEN` o `GITHUB_TOKEN` con los permisos
-correspondientes. No se almacena ningún token en archivos del repositorio.
-`subject-agents.yml` utiliza el secreto existente `PAT_TOKEN`, expuesto al script
-como `ORG_ADMIN_TOKEN`; necesita Contents y Workflows: write sobre los repos
-de materia. La CLI autenticada no reemplaza automáticamente ese secreto.
-Solo publica desde main. La creación por el script instala las instrucciones
-inmediatamente; una materia declarada y creada por otro medio recibe los
-archivos en la siguiente ejecución diaria o manual del workflow.
+repos de materia usan la sesión local de `gh`, con escritura y permiso para
+publicar workflows. No se almacena ningún token en archivos del repositorio ni
+se requiere un PAT de Actions. La auditoría de solo lectura mantiene el token
+integrado de GitHub. La creación por el script instala las instrucciones
+inmediatamente; para una materia declarada y creada por otro medio, ejecutar
+`uv run scripts/sync_repos.py` en la laptop. Repetirlo al cambiar las plantillas.
 
 GitHub puede deshabilitar workflows programados por inactividad. Verificar
 su estado con `gh workflow list --all --repo apuntes-frre/.github`.
