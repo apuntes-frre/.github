@@ -9,7 +9,9 @@
 - OneDrive es la fuente canónica indicada por el propietario. Localizar la
   carpeta de esta materia y comprobar que los archivos estén descargados y
   legibles antes de convertirlos. En esta laptop, buscar bajo
-  `~/Library/CloudStorage/OneDrive-*/Facultad/Materias ISI/`.
+  `~/Library/CloudStorage/OneDrive-*/Facultad/Materias ISI/`. Si el mapeo está
+  pendiente o no aparece la materia, buscar también en el resto de `Facultad/`,
+  incluida `Materias Homogeneas/`, y verificar la pertenencia en los documentos.
 - Consultar el mapeo `transcription/sources.json` del repo de control
   `apuntes-frre/.github` (con `gh api` o su clone local). Un valor `null`
   requiere identificar la fuente; no asignar por semejanza curricular. Los

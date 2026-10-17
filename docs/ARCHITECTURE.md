@@ -54,6 +54,9 @@ Los PDFs de `data/sources/` preservan la procedencia curricular y se conservan.
 | `scripts/sync_readme.py` | Generar el perfil con nombres del manifest y estado público de GitHub. |
 | `scripts/gen_repo_readme.py` | Generar el inventario del árbol local en `docs/README.md`. |
 | `scripts/__main__.py` | Índice local de scripts y módulos, sin importar sus dependencias. |
+| `scripts/inventory_sources.py` | Inventario de metadatos de OneDrive y notas existentes, con mapeos pendientes explícitos. |
+| `scripts/transcription_preflight.py` | Comprobar ayuda/versiones, copiar fuentes seleccionadas y verificar SHA-256 y páginas PDF; no realiza conversiones. |
+| `scripts/check_transcription.py` | Validar formato, enlaces, medios y LaTeX del cambio; la fidelidad requiere revisión de originales. |
 
 Los ejecutables usan PEP 723 y `uv run`; no requieren un proyecto Python
 instalable ni `requirements.txt`. Python mínimo: 3.12.
