@@ -38,7 +38,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 - 📁 [`isi-2008-economia`](https://github.com/apuntes-frre/isi-2008-economia) — **Economía**
 - 📁 [`isi-2008-fisica-i`](https://github.com/apuntes-frre/isi-2008-fisica-i) — **Física I**
 - 📁 [`isi-2008-fisica-ii`](https://github.com/apuntes-frre/isi-2008-fisica-ii) — **Física II**
-- 📁 [`isi-2008-gestion-de-datos`](https://github.com/apuntes-frre/isi-2008-gestion-de-datos) — **Gestión de Datos**
+- 📁 [`isi-2008-gestion-de-datos`](https://github.com/apuntes-frre/isi-2008-gestion-de-datos) — **Gestión de Datos** — Unidad i comprension y fijacion, Unidad i cuestionario grupo 4 borrador, Unidad i cuestionario grupo 4
 - 📁 [`isi-2008-ingenieria-de-software`](https://github.com/apuntes-frre/isi-2008-ingenieria-de-software) — **Ingeniería de Software**
 - 📁 [`isi-2008-ingenieria-y-sociedad`](https://github.com/apuntes-frre/isi-2008-ingenieria-y-sociedad) — **Ingeniería y Sociedad**
 - 📁 [`isi-2008-ingles-i`](https://github.com/apuntes-frre/isi-2008-ingles-i) — **Inglés I**
@@ -65,6 +65,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 ## 🔄 Actualizaciones recientes
 
+- `2026-10-17` · **isi-2008-gestion-de-datos** — Merge pull request #1 from apuntes-frre/codex/gestion-datos-transcription-pilot
 - `2026-10-17` · **isi-2008-analisis-matematico-ii** — Merge pull request #4 from apuntes-frre/codex/guia-de-lectura
 
 ---
