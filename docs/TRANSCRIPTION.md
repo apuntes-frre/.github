@@ -43,6 +43,15 @@ archivos de materias se ejecuta desde la laptop.
 con repos. Sus `null` requieren identificar la fuente; electivas como BDA o
 Taller Álgebra no se asignan automáticamente a una materia/plan.
 
+El inventario predeterminado solo busca en `Facultad/Materias ISI/` y usa los
+mapeos no nulos. Si falta una fuente, buscar en el resto de `Facultad/`, incluida
+`Materias Homogeneas/`, y verificar el contenido. Por ejemplo, Análisis Matemático
+II está en `Facultad/Materias Homogeneas/Analisis Matemático II`; su mapeo sigue
+pendiente porque el inventario actual representa carpetas de una sola raíz.
+`--source-root` cambia esa raíz, pero no resuelve mapeos nulos ni combina raíces.
+Registrar las fuentes identificadas fuera del mapeo en la asignación y en
+`resources/<año>/fuentes.md`.
+
 ```sh
 uv run scripts/inventory_sources.py --output /ruta/temporal/source-inventory.json
 ```
@@ -66,8 +75,10 @@ mise exec -- uv run .github/transcription/preflight.py --engine pymupdf4llm \
   --work-dir /ruta/temporal/nueva /ruta/OneDrive/fuente.pdf
 ```
 
-El preflight prueba el arranque de herramientas, materializa fuentes
-seleccionadas, verifica SHA-256 y cuenta páginas PDF. Para Docling, agregar
+El preflight ejecuta la ayuda o versión de las herramientas, materializa fuentes
+seleccionadas, verifica SHA-256 y cuenta páginas PDF. No convierte documentos:
+antes de procesar un lote, comprobar por separado una conversión real sobre una
+muestra representativa. Para Docling, agregar
 `--download-models` y comprobar una conversión real; modelos opcionales como
 fórmulas requieren su prueba específica. En OCR, se comprueba el idioma
 solicitado, por defecto español. Mantener Python estable para los entornos:

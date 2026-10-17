@@ -10,7 +10,9 @@ con automatización predecible. El diseño técnico está en
 - Contenido en español; código e identificadores en inglés.
 - Las carpetas aparecen con material real, sin placeholders.
 - Generar y publicar solo cuando cambie el contenido.
-- Operaciones remotas en dry-run por defecto, publicación explícita con `--apply`.
+- Los subcomandos de publicación usan dry-run por defecto y requieren `--apply`.
+  La excepción es `uv run scripts/sync_repos.py` sin argumentos: publica
+  directamente el bootstrap y los READMEs en las materias existentes declaradas.
 - Conservar el plan 2008 al incorporar planes nuevos.
 
 ## Trabajo realizado
