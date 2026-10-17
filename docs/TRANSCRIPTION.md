@@ -100,10 +100,63 @@ mise -C .github/transcription exec -- uv run check.py --base origin/main
 MyST agrega parsing de matemática con delimitadores GitHub. Las regresiones
 comprueban negación, fracciones, subíndices, matrices, tablas GFM y listas de
 tareas. El validador exige preservación del formato, enlaces relativos/anclas,
-imágenes, ausencia de marcadores defectuosos y KaTeX sin errores. Al eliminar
-medios se detectan referencias afectadas sin formatear notas antiguas.
+imágenes, nombres públicos por tema, ausencia de marcadores defectuosos y
+KaTeX sin errores. Incluye los fences `math` y expresiones protegidas con uno o
+más backticks. Al eliminar medios se detectan referencias afectadas sin
+formatear notas antiguas.
 
 CI usa los mismos scripts y versiones fijadas con el base SHA del PR o el commit
 anterior al push. La validación no exige reformatear toda la materia ni
 determina si una fórmula coincide con el original. La revisión documental
 completa sigue siendo condición de entrega.
+
+## Publicación y renderizado real en GitHub
+
+Elegir nombres por tema antes de procesar el lote: español, ASCII y kebab-case,
+sin prefijos internos (`office-`, `pdf2020-`, `resume-`) ni hashes. Distinguir
+con autor, parte, fecha verificada o versión; el año de archivo ya está en la
+ruta. Registrar nombres originales y SHA-256 por separado. Cambiar nombres
+requiere actualizar guía, enlaces a medios, reportes e inventario; comprobar
+colisiones y conservar los bytes de los medios.
+
+GitHub usa MathJax; KaTeX es una comprobación local de sintaxis. La
+[documentación de GitHub](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/writing-mathematical-expressions)
+describe las expresiones protegidas en línea y los fences `math`. Las siguientes
+restricciones reproducen fallos observados en Análisis Matemático II el
+2026-10-17; no son una lista completa de diferencias entre motores:
+
+- Proteger los metacaracteres Markdown de LaTeX usando backticks dentro de los
+  dólares. Para una expresión con un acento grave interior, usar dos backticks
+  exteriores; conservar el símbolo original, sin convertirlo en una prima.
+- Usar fences `math` independientes para bloques. Dentro de una lista, conservar
+  el ejercicio con un párrafo matemático en línea protegido y `\displaystyle`;
+  no anidar fences ni bloques de dólares.
+- No cerrar el énfasis inmediatamente después de la fórmula: usar
+  `*la misma forma que*` seguido de la expresión. Las fórmulas con texto o
+  puntuación posterior dentro del énfasis sí renderizaron; no prohibirlas en
+  bloque. Para matemática en una nota al pie, conservar el texto íntegro en una
+  sección «Nota del original» y enlazarla desde la nota al pie.
+- Usar `\lt` y `\gt` para evitar que las comparaciones se interpreten como HTML;
+  `\mathop{\mathrm{sen}}\nolimits` conserva el operador «sen» cuando GitHub
+  rechaza `\operatorname`. Colocar `\tag{1}` después de `\end{aligned}`, sin
+  perder la etiqueta.
+
+Antes de ampliar un lote, probar una muestra con cada contexto que se vaya a
+usar en el renderizador real de GitHub. Antes de entregar, revisar los apuntes
+modificados: contar expresiones esperadas con `math_expressions`, compararlas
+con las efectivamente renderizadas y comprobar errores, estados pendientes y
+expresiones que quedaron como código/texto. Cero errores visibles no implica que
+se haya renderizado todo. Una respuesta HTML de la API Markdown tampoco prueba
+el procesamiento posterior de MathJax en el navegador. Registrar URL, revisión,
+conteos y casos pendientes; no declarar compatibilidad completa si faltó
+comprobarla. El renderizado no sustituye la comparación con las fuentes.
+
+Los
+[PR #5](https://github.com/apuntes-frre/isi-2008-analisis-matematico-ii/pull/5),
+[PR #6](https://github.com/apuntes-frre/isi-2008-analisis-matematico-ii/pull/6)
+y
+[PR #7](https://github.com/apuntes-frre/isi-2008-analisis-matematico-ii/pull/7)
+contienen las correcciones de esos casos. Los controles reutilizables viven en
+`scripts/check_transcription.py` y `tests/test_transcription.py`; corregirlos
+allí y sincronizar el bootstrap, evitando mantener un validador divergente en
+una sola materia.

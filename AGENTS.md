@@ -65,6 +65,11 @@ de `gh`, valida los manifests y publica el bootstrap y los READMEs en las materi
 existentes declaradas. No requiere secretos de Actions ni variables de entorno.
 Seguir [el flujo](docs/TRANSCRIPTION.md).
 
+Corregir la validación en `scripts/check_transcription.py` y sus regresiones en
+`tests/test_transcription.py`, no solo en la copia de una materia: una posterior
+sincronización del bootstrap sobrescribe las copias distribuidas. Verificar los
+casos que fallaban y las formas válidas antes de sincronizar.
+
 ## Tooling
 
 Scripts en [`scripts/`](scripts/), PEP 723, ejecutados con `uv run`:

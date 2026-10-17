@@ -100,12 +100,26 @@ del runtime con `load_workspace_dependencies`.
 
 ## Notación y organización
 
-- Escribir fórmulas en LaTeX: `$...$` en línea y bloques `$$` en líneas
-  separadas. Preservar subíndices, exponentes, fracciones, letras griegas y
-  barras de negación; comparar con el original y verificar su renderizado.
+- Preservar las fórmulas en LaTeX y compararlas con el original. Para GitHub,
+  usar expresiones en línea protegidas con backticks dentro de los dólares y
+  bloques independientes con fence `math`. Si la expresión contiene un acento
+  grave, usar delimitadores de backticks más largos que los interiores.
+- GitHub usa MathJax; KaTeX solo comprueba sintaxis local. No anidar bloques
+  matemáticos en listas: conservar el ejercicio con un párrafo matemático en
+  línea protegido y `\displaystyle`. No cerrar cursivas justo después de una
+  fórmula. Sacar la matemática de las notas al pie y conservar su texto en una
+  sección enlazada. Usar `\lt`/`\gt`
+  en comparaciones, `\mathop{\mathrm{nombre}}\nolimits` para los operadores
+  afectados por el rechazo de `\operatorname` y colocar `\tag` fuera de
+  `aligned`. Ver ejemplos y límites en
+  [el flujo de transcripción](https://github.com/apuntes-frre/.github/blob/main/docs/TRANSCRIPTION.md).
 - Guardar apuntes en `notes/<año>/{teoria,practica}/`, guías en `study-guides/`
-  y medios en `resources/<año>/`. Usar nombres en español, ASCII kebab-case. No
-  crear carpetas vacías ni `.gitkeep`.
+  y medios en `resources/<año>/`. Nombrar por tema, en español y ASCII
+  kebab-case, sin prefijos de formato/lote (`office-`, `pdf2020-`, `resume-`) ni
+  hashes. Distinguir versiones con autor, parte, fecha `aaaa-mm-dd` (o `aaaa-mm`
+  si no consta el día) o `version-1`; no inventar fechas. Conservar nombres
+  originales y SHA-256 en el inventario. Renombrar también los medios asociados
+  y actualizar enlaces e inventario. No crear carpetas vacías ni `.gitkeep`.
 - Mantener imágenes originales como PNG/SVG/JPEG con enlaces relativos; extraer
   o convertir objetos incrustados y revisar etiquetas y conexiones. No incluir
   base64 ni reemplazar por capturas fórmulas que puedan transcribirse.
@@ -138,7 +152,12 @@ del runtime con `load_workspace_dependencies`.
    ```
 
    CI revisa las notas modificadas y referencias a medios eliminados. No exige
-   reformatear contenido anterior. KaTeX válido y CI verde no reemplazan la
+   reformatear contenido anterior. Antes de ampliar un lote, probar sus
+   contextos matemáticos en el renderizador real de GitHub. Antes de entregar,
+   comprobar en cada apunte modificado que el número de expresiones renderizadas
+   coincide con el esperado y que no hay errores ni fórmulas mostradas como
+   código/texto; cero mensajes de error no basta. Registrar revisión y casos
+   pendientes. KaTeX válido y CI verde no sustituyen esa comprobación ni la
    comparación completa con originales.
 
 1. Trabajar en una rama de revisión, preservar cambios existentes y entregar el

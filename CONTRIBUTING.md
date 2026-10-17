@@ -24,7 +24,11 @@ y abrí un PR con los cambios y su validación.
     └── <año>/                        # material (imágenes, PDFs) de un año puntual
 ```
 
-- Nombres en **kebab-case, español, ASCII**: `tabla-hash.md`, no `Tabla Hash.md`.
+- Nombres por tema en **kebab-case, español, ASCII**: `integrales-de-linea.md`.
+  Omitir prefijos de conversión/lote y hashes (`office-`, `pdf2020-`, `resume-`).
+  Distinguir documentos con autor, parte, fecha verificada o versión. Conservar
+  los nombres originales y SHA-256 en el registro de fuentes; actualizar enlaces,
+  medios e inventario al renombrar.
 - Las carpetas se crean **cuando hay contenido** (no usamos `.gitkeep`).
 - Las imágenes van a `resources/` y se referencian; no se pegan como base64.
 
@@ -82,6 +86,11 @@ mise -C .github/transcription exec -- uv run check.py --base origin/main
 GFM + MyST preserva la notación matemática; GFM solo no la preserva. La
 validación se limita al cambio, incluye referencias a medios eliminados y
 usa KaTeX para detectar LaTeX inválido. Revisá fórmulas después de formatear.
+GitHub usa MathJax: antes de entregar, comprobá también cada apunte modificado
+en GitHub, comparando las expresiones esperadas con las renderizadas. Cero
+errores visibles no detecta fórmulas que quedaron como texto/código. AGENTS
+incluye las restricciones observadas para listas, cursivas, notas al pie y
+macros; el flujo completo está en `docs/TRANSCRIPTION.md` del repo de control.
 
 ## Convertir según el formato de origen
 
