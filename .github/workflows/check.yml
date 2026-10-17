@@ -34,7 +34,7 @@ jobs:
           cache-dependency-glob: 'tests/test_scripts.py'
       - name: Run regressions without GitHub access
         run: uv run tests/test_scripts.py
-      - uses: jdx/mise-action@v3
+      - uses: jdx/mise-action@v4
         with:
           working_directory: templates/transcription
       - name: Check transcription regressions and math rendering
