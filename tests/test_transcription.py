@@ -95,6 +95,113 @@ $esto no es una ecuación$
             self.assertEqual(len(errors), 1)
             self.assertIn("legacy.md", errors[0])
 
+    def test_github_rendering_failures_are_rejected(self):
+        cases = [
+            (r"$\operatorname{sen}x$", "operatorname"),
+            ("```math\n\\operatorname{sen}x\n```", "operatorname"),
+            (r"$x\,dx$", "escapes Markdown"),
+            ("```math\nf(x)=\\begin{cases}x&0<x<1\\end{cases}\n```", "comparaciones como HTML"),
+            ("1. Ejercicio\n\n   ```math\n   x+1\n   ```", "bloque matemático anidado"),
+            ("1. Ejercicio\n\n   $$\n   x+1\n   $$", "bloque matemático anidado"),
+            ("```math\n\\begin{aligned}x&=1\\tag{1}\\end{aligned}\n```", "tag dentro de aligned"),
+            (r"*La misma forma que $`g(x)`$*", "cursivas"),
+            ("Texto[^nota].\n\n[^nota]: $`y'=u`$", "nota al pie"),
+            ("Texto[^nota].\n\n[^nota]: Texto.\n\n    ```math\n    x+1\n    ```", "nota al pie"),
+            (r"$`x^{`}`$", "acento grave"),
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for source, message in cases:
+                with self.subTest(source=source):
+                    errors = check.check_text(root, root / "nota.md", check.formatted(source))
+                    self.assertTrue(any(message in error for error in errors), errors)
+
+    def test_github_safe_forms_preserve_math_and_pass(self):
+        source = r"""# Formas comprobadas
+
+$`\mathop{\mathrm{sen}}\nolimits x`$, $``x^{`}``$ y *la misma forma que* $`g(x)`$.
+
+1. Ejercicio.
+
+   $`\displaystyle x+1`$
+
+```math
+\begin{aligned}x&=1\end{aligned}\tag{1}
+```
+
+Texto[^nota].
+
+## Nota del original
+
+$`y'=u`$ y $`x\lt 1`$.
+
+[^nota]: Véase la [nota del original](#nota-del-original).
+
+```text
+$\operatorname{sen}x$ y *$`g(x)`$* son ejemplos de errores.
+```
+"""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "nota.md"
+            text = check.formatted(source)
+            path.write_text(text)
+            self.assertEqual(check.check_text(root, path, text), [])
+            self.assertEqual(check.math_expressions(text), [
+                (r"\mathop{\mathrm{sen}}\nolimits x", False), ("x^{`}", False),
+                ("g(x)", False), (r"\displaystyle x+1", False),
+                (r"\begin{aligned}x&=1\end{aligned}\tag{1}", True),
+                ("y'=u", False), (r"x\lt 1", False),
+            ])
+
+    def test_math_inside_emphasis_with_trailing_text_is_allowed(self):
+        # Estas dos formas renderizan en el documento real; no prohibir todo énfasis.
+        source = r"*La forma de $`y_p`$ es una combinación de $`g(x)`$.*"
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.assertEqual(check.check_text(root, root / "nota.md", check.formatted(source)), [])
+
+    def test_published_names_reject_internal_batches_and_hashes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ["notes/2022/practica/office-repaso-2e04ae39.md",
+                         "notes/2020/teoria/pdf2020-gradiente.md",
+                         "resources/2016/resume-misc-grafica/figura-1.png",
+                         "notes/2020/teoria/repaso-2e04ae39.md",
+                         "resources/2020/Taylor/image1.png"]:
+                with self.subTest(name=name):
+                    self.assertTrue(check.published_path_errors(root, root / name))
+            for name in ["notes/2022/practica/repaso.md", "resources/2020/zill-02/figura-1.png",
+                         "notes/2016/practica/examen-final-2012-07-11.md",
+                         "notes/2016/practica/diferenciales-bis-version-2.md"]:
+                self.assertEqual(check.published_path_errors(root, root / name), [])
+            # Las rutas canónicas originales y los archivos de configuración no se renombran.
+            self.assertEqual(check.published_path_errors(root, root / "originales/Taylor.docx"), [])
+            self.assertEqual(check.published_path_errors(root, root / "AGENTS.md"), [])
+
+    def test_cli_checks_unreferenced_asset_names_without_rechecking_legacy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for args in [("init",), ("config", "user.name", "Test"),
+                         ("config", "user.email", "test@example.com")]:
+                subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True)
+            (root / "notes").mkdir()
+            (root / "notes/legacy.md").write_text("#Legacy sin formatear\n")
+            subprocess.run(["git", "-C", str(root), "add", "."], check=True, capture_output=True)
+            subprocess.run(["git", "-C", str(root), "commit", "-m", "baseline"], check=True, capture_output=True)
+            assets = root / "resources/2026"
+            assets.mkdir(parents=True)
+            bad = assets / "office-figura-1234abcd.png"
+            bad.write_bytes(b"unchanged media")
+            result = subprocess.run([sys.executable, check.__file__, "--base", "HEAD"],
+                                    cwd=root, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("prefijo de lote o hash", result.stdout)
+            bad.rename(assets / "taylor-figura-1.png")
+            result = subprocess.run([sys.executable, check.__file__, "--base", "HEAD"],
+                                    cwd=root, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_materialization_verifies_bytes_without_overwriting(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
