@@ -31,7 +31,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 - 📁 [`isi-2008-algoritmos-y-estructuras-de-datos`](https://github.com/apuntes-frre/isi-2008-algoritmos-y-estructuras-de-datos) — **Algoritmos y Estructuras de Datos**
 - 📁 [`isi-2008-analisis-de-sistemas`](https://github.com/apuntes-frre/isi-2008-analisis-de-sistemas) — **Análisis de Sistemas**
 - 📁 [`isi-2008-analisis-matematico-i`](https://github.com/apuntes-frre/isi-2008-analisis-matematico-i) — **Análisis Matemático I**
-- 📁 [`isi-2008-analisis-matematico-ii`](https://github.com/apuntes-frre/isi-2008-analisis-matematico-ii) — **Análisis Matemático II** — Office repaso 2e04ae39, Office series de fourier 06f15262, Office trabajo practico 1 62164cd9
+- 📁 [`isi-2008-analisis-matematico-ii`](https://github.com/apuntes-frre/isi-2008-analisis-matematico-ii) — **Análisis Matemático II** — Derivadas parciales, Diferenciales, Gradiente derivadas direccionales
 - 📁 [`isi-2008-arquitectura-de-computadoras`](https://github.com/apuntes-frre/isi-2008-arquitectura-de-computadoras) — **Arquitectura de Computadoras** — 01 guia combinacionales, 00 guia codificacion, Guia sistemas numericos
 - 📁 [`isi-2008-comunicaciones`](https://github.com/apuntes-frre/isi-2008-comunicaciones) — **Comunicaciones**
 - 📁 [`isi-2008-diseno-de-sistemas`](https://github.com/apuntes-frre/isi-2008-diseno-de-sistemas) — **Diseño de Sistemas**
@@ -65,8 +65,8 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 ## 🔄 Actualizaciones recientes
 
+- `2026-10-17` · **isi-2008-analisis-matematico-ii** — Merge pull request #7 from apuntes-frre/codex/estandarizar-nombres
 - `2026-10-17` · **isi-2008-gestion-de-datos** — Merge pull request #1 from apuntes-frre/codex/gestion-datos-transcription-pilot
-- `2026-10-17` · **isi-2008-analisis-matematico-ii** — Merge pull request #4 from apuntes-frre/codex/guia-de-lectura
 
 ---
 
