@@ -88,9 +88,12 @@ Scripts en [`scripts/`](scripts/), PEP 723, ejecutados con `uv run`:
 son pendientes explícitos. No inferir equivalencias entre planes 2008/2023.
 
 `manifest validate` verifica campos, referencias y ciclos. `manifest diff`
-compara solo la carrera y el plan seleccionados; sale con código 1 ante
-repos faltantes, sobrantes o descripciones diferentes.
-Las correlativas del plan 2023 están pendientes: no inferir que no hay requisitos.
+compara solo la carrera y el plan seleccionados; sale con código 1 ante repos
+faltantes, sobrantes o descripciones diferentes. Las correlativas de las 36
+materias obligatorias del plan 2023 están verificadas contra el Anexo I de la
+Ordenanza 1878/2022. Ver `data/sources/corre.md` para procedencia, PPS y
+alcance. Las electivas no especificadas quedan fuera de esa cobertura; no
+inferir equivalencias de apuntes entre planes.
 
 Para verificar cambios sin acceder a GitHub: `uv run tests/test_scripts.py`.
 

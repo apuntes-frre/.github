@@ -40,10 +40,27 @@ bajo `[planes.<año>.materias.<slug>]`. Se validan nombres, slugs, campos,
 tipos, orden único y niveles. Las correlativas referencian slugs existentes
 y su grafo debe ser acíclico.
 
-`correlativas-estado` distingue `completas` de `pendientes`. El plan 2023
-está pendiente de definición de correlativas por FRRE: la ausencia de datos
-no significa ausencia de requisitos. Sus READMEs muestran esa advertencia.
-Los PDFs de `data/sources/` preservan la procedencia curricular y se conservan.
+`correlativas-estado` distingue `completas` de `pendientes` de carga y revisión
+documental. El plan 2023 cubre las 36 obligatorias del Anexo I de la Ordenanza
+1878/2022; no incluye correlativas de electivas no especificadas. Los PDFs se
+preservan en `data/sources/`; [corre.md](../data/sources/corre.md) registra la
+fuente, hash, páginas revisadas, condiciones especiales y límites de cobertura.
+
+Las listas `correlativas-cursar-cursadas`, `correlativas-cursar-aprobadas`,
+`correlativas-rendir-cursadas` y `correlativas-rendir-aprobadas` referencian
+slugs del mismo plan. Todas se validan por tipo, existencia y ciclos. Se
+rechazan claves de materia desconocidas con prefijo `correlativas-`. En 2023,
+las columnas conjuntas «para cursar y rendir» se cargan en ambas acciones sin
+convertir una cursada en aprobación final. Las nueve materias sin requisitos
+llevan las cuatro listas vacías y muestran «Sin correlativas para cursar ni
+rendir». La ausencia de datos en un plan pendiente sigue mostrando una
+advertencia.
+
+Proyecto Final tiene requisitos propios para cursar y
+`correlativas-rendir-todas = true` para rendir: todas las asignaturas previas
+del plan aprobadas. La condición de iniciar y acreditar PPS queda en
+`practica-supervisada-requisitos`, a nivel de plan; no crea una materia ni repo.
+El renderizado de las 35 materias del plan 2008 conserva sus bytes previos.
 
 ## Scripts
 
@@ -81,15 +98,26 @@ publica el bootstrap y los READMEs de las materias existentes declaradas. Se
 ejecuta localmente; no crea ni archiva repos, no modifica `.gitignore` ni
 actualiza clones. Una segunda ejecución debe informar cero escrituras.
 
-El índice y los comandos `manifest list`, `validate` y `diff` solo leen. `manifest diff` sale con código 1
-ante repos faltantes, sobrantes o descripciones diferentes.
-`manifest sync`, `readmes`, `contributing`, `gitignore`, `agents` y `bootstrap` son dry-run por
-defecto; agregar `--apply` para publicar. `manifest sync --archive --apply`
-solo puede archivar sobrantes de la carrera y el plan seleccionados.
+El índice y los comandos `manifest list`, `validate` y `diff` solo leen.
+`manifest diff` sale con código 1 ante repos faltantes, sobrantes o
+descripciones diferentes. `manifest sync`, `readmes`, `contributing`,
+`gitignore`, `agents` y `bootstrap` son dry-run por defecto; agregar `--apply`
+para publicar. `manifest sync --archive --apply` solo puede archivar sobrantes
+de la carrera y el plan seleccionados. `manifest sync` sin `--apply` solo
+previsualiza. Con `--apply` crea los repos faltantes (públicos por defecto;
+`--private` permite privados), actualiza las descripciones e instala el
+bootstrap de los nuevos. No genera los READMEs finales de las materias ni crea
+clones locales. Luego, la sincronización sin argumentos publica bootstrap y
+READMEs en todos los planes existentes declarados. Repetirla debe dar cero
+escrituras. `manifest diff` compara existencia y descripciones, no cobertura
+documental. La publicación del código del control y la creación de repos de un
+plan son aprobaciones separadas.
+
 Al crear una materia, `manifest sync --apply` instala AGENTS, CONTRIBUTING,
 preflight, validador y CI desde las fuentes compartidas. `bootstrap` sincroniza
-el conjunto y repara instalaciones parciales. `agents` permite revisar las instrucciones
-en todos los repos activos declarados en los manifests, sin crear repos nuevos.
+el conjunto y repara instalaciones parciales. `agents` permite revisar las
+instrucciones en todos los repos activos declarados en los manifests, sin crear
+repos nuevos.
 
 La publicación de archivos usa una sola implementación: leer, comparar y
 crear o actualizar solo si difiere. Solo una respuesta HTTP 404 se interpreta

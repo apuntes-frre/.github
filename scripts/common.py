@@ -17,6 +17,7 @@ REPO_NAME_RE = re.compile(r"^([a-z]+)-(\d{4})-([a-z0-9]+(?:-[a-z0-9]+)*)$")
 PREREQUISITE_KEYS = (
     "correlativas-cursar-cursadas",
     "correlativas-cursar-aprobadas",
+    "correlativas-rendir-cursadas",
     "correlativas-rendir-aprobadas",
 )
 
@@ -79,6 +80,11 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
             for field in ("integradora", "correlativas-rendir-todas"):
                 if field in subject and type(subject[field]) is not bool:
                     raise ValueError(f"{label}.{field}: debe ser booleano")
+            unknown = {key for key in subject if key.startswith("correlativas-")} - {
+                *PREREQUISITE_KEYS, "correlativas-rendir-todas"
+            }
+            if unknown:
+                raise ValueError(f"{label}: claves de correlativas desconocidas: {sorted(unknown)}")
             refs: set[str] = set()
             for field in PREREQUISITE_KEYS:
                 values = subject.get(field, [])

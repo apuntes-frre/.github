@@ -8,6 +8,8 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
+import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -434,7 +436,7 @@ class ManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "ciclo"):
             common.validate_manifest(self.manifest)
 
-    def test_all_71_subject_readmes_render_and_pending_prerequisites_are_explicit(self):
+    def test_all_71_subject_readmes_render_deterministically(self):
         template = common.template_environment().get_template("subject_readme.md.j2")
         count = 0
         for plan, data in self.manifest["planes"].items():
@@ -450,9 +452,107 @@ class ManifestTests(unittest.TestCase):
                     ),
                 )
                 if plan == "2023":
-                    self.assertIn("Pendientes de definición", rendered)
+                    self.assertNotIn("Pendientes", rendered)
+                    self.assertIn("## 🔗 Correlativas", rendered)
                 count += 1
         self.assertEqual(count, 71)
+
+    def test_exam_completed_requirements_validate_types_references_and_cycles(self):
+        field = "correlativas-rendir-cursadas"
+        for value in ("fisica-i", [1], ["missing"], ["analisis-matematico-i"]):
+            with self.subTest(value=value):
+                manifest = deepcopy(self.manifest)
+                manifest["planes"]["2023"]["materias"]["analisis-matematico-i"][field] = value
+                with self.assertRaises(ValueError):
+                    common.validate_manifest(manifest)
+        subjects = self.manifest["planes"]["2023"]["materias"]
+        subjects["analisis-matematico-i"][field] = ["analisis-matematico-ii"]
+        with self.assertRaisesRegex(ValueError, "ciclo"):
+            common.validate_manifest(self.manifest)
+
+    def test_exam_completed_requirements_render_without_other_requirements(self):
+        subjects = self.manifest["planes"]["2023"]["materias"]
+        subjects["fisica-i"]["correlativas-rendir-cursadas"] = ["ingles-i"]
+        common.validate_manifest(self.manifest)
+        template = common.template_environment().get_template("subject_readme.md.j2")
+        rendered = sync_repos._render_subject_readme(self.manifest, "2023", "fisica-i", template)
+        self.assertIn("## 🔗 Correlativas", rendered)
+        self.assertIn("**Para rendir — cursadas:** Inglés I", rendered)
+        self.assertNotIn("**Para cursar", rendered)
+        self.assertNotIn("**Para rendir — aprobadas", rendered)
+        self.assertNotIn("Sin correlativas", rendered)
+
+    def test_unknown_prerequisite_keys_are_rejected(self):
+        self.manifest["planes"]["2023"]["materias"]["fisica-i"]["correlativas-rendir-cursada"] = []
+        with self.assertRaisesRegex(ValueError, "correlativas-rendir-cursada"):
+            common.validate_manifest(self.manifest)
+
+    def test_all_2023_rows_match_reviewed_annex_and_render_each_requirement(self):
+        expected = json.loads((common.ROOT / "tests/fixtures/isi-2023-prerequisites.json").read_text())
+        plan = self.manifest["planes"]["2023"]
+        subjects = plan["materias"]
+        self.assertEqual(plan["correlativas-estado"], "completas")
+        self.assertEqual(len(expected), 36)
+        self.assertEqual({row["order"] for row in expected}, set(range(1, 37)))
+        self.assertEqual({row["slug"] for row in expected}, set(subjects))
+        slugs = {row["order"]: row["slug"] for row in expected}
+        names = {row["order"]: row["name"] for row in expected}
+        template = common.template_environment().get_template("subject_readme.md.j2")
+        empty = []
+        for row in expected:
+            with self.subTest(order=row["order"]):
+                subject = subjects[row["slug"]]
+                self.assertEqual(subject["orden"], row["order"])
+                self.assertEqual(subject["nombre"], row["name"])
+                rendered = sync_repos._render_subject_readme(self.manifest, "2023", row["slug"], template)
+                for action, label in (("cursar", "Para cursar"), ("rendir", "Para rendir")):
+                    for kind, column in (("cursadas", "completed"), ("aprobadas", "approved")):
+                        numbers = [] if action == "rendir" and row["order"] == 36 else row[column]
+                        self.assertEqual(subject[f"correlativas-{action}-{kind}"], [slugs[n] for n in numbers])
+                        prefix = f"**{label} — {kind}:**"
+                        if numbers:
+                            self.assertIn(prefix + " " + ", ".join(names[n] for n in numbers), rendered)
+                        else:
+                            self.assertNotIn(prefix, rendered)
+                self.assertEqual(subject.get("correlativas-rendir-todas", False), row["order"] == 36)
+                if row["order"] == 36:
+                    self.assertIn("**Para rendir:** tener aprobadas todas las asignaturas previas del plan de estudios.", rendered)
+                if not row["completed"] and not row["approved"]:
+                    empty.append(row["order"])
+                    self.assertIn("Sin correlativas para cursar ni rendir.", rendered)
+                else:
+                    self.assertNotIn("Sin correlativas", rendered)
+        self.assertEqual(empty, [1, 2, 3, 4, 5, 6, 7, 8, 11])
+
+    def test_2023_source_provenance_and_pps_are_plan_metadata(self):
+        plan = self.manifest["planes"]["2023"]
+        self.assertEqual(plan["correlativas-fuente"], "data/sources/corre.pdf")
+        digest = hashlib.sha256((common.ROOT / plan["correlativas-fuente"]).read_bytes()).hexdigest()
+        self.assertEqual(digest, "982f1b148e3ae7e64081ee1d01fa75a7c8cef6bd272aebc45f0138d8f7df998f")
+        provenance = (common.ROOT / "data/sources/corre.md").read_text()
+        for value in (digest, "https://www.frre.utn.edu.ar/media/ISI/documentos/corre.pdf", "2026-10-17", "3–5"):
+            self.assertIn(value, provenance)
+        self.assertEqual(plan["practica-supervisada-requisitos"], "Para iniciar y acreditar la PPS se requieren las condiciones académicas de inscripción a Proyecto Final.")
+        self.assertEqual(plan["practica-supervisada-hs"], 200)
+        self.assertFalse(any("pps" in slug or "practica" in slug for slug in plan["materias"]))
+
+    def test_all_35_plan_2008_renders_are_byte_identical(self):
+        expected = json.loads((common.ROOT / "tests/fixtures/isi-2008-readme-sha256.json").read_text())
+        self.assertEqual(set(expected), set(self.manifest["planes"]["2008"]["materias"]))
+        self.assertEqual(len(expected), 35)
+        template = common.template_environment().get_template("subject_readme.md.j2")
+        for slug, digest in expected.items():
+            with self.subTest(slug=slug):
+                rendered = sync_repos._render_subject_readme(self.manifest, "2008", slug, template)
+                self.assertEqual(hashlib.sha256(rendered.encode()).hexdigest(), digest)
+
+    def test_pending_plan_remains_explicit_without_claiming_undefined_rules(self):
+        self.manifest["planes"]["2023"]["correlativas-estado"] = "pendientes"
+        template = common.template_environment().get_template("subject_readme.md.j2")
+        rendered = sync_repos._render_subject_readme(self.manifest, "2023", "fisica-i", template)
+        self.assertIn("Pendientes de carga y verificación documental", rendered)
+        self.assertNotIn("Sin correlativas", rendered)
+        self.assertNotIn("Pendientes de definición", rendered)
 
 
 class RenderingTests(unittest.TestCase):

@@ -31,7 +31,8 @@ con automatización predecible. El diseño técnico está en
 
 - Selección de repos limitada a la carrera y el plan solicitados, incluso al archivar.
 - Validación de campos, orden único, referencias y ciclos antes de publicar.
-- Correlativas pendientes del plan 2023 señaladas explícitamente.
+- Correlativas de las 36 obligatorias del plan 2023 verificadas contra la
+  Ordenanza 1878/2022.
 - Una implementación de publicación idempotente; errores de API no equivalen a archivo ausente.
 - Perfil con nombres del manifest y nombres de notas reales.
 - Perfil e inventario publicados por un único workflow, con triggers de sus fuentes.
@@ -45,18 +46,31 @@ con automatización predecible. El diseño técnico está en
 
 ### Publicación del plan 2023
 
-El manifest contiene 36 materias. Sus correlativas de FRRE están pendientes;
-completar y verificar la fuente antes de presentar el plan como completo.
-Crear sus repos solo mediante una operación manual aprobada:
+El manifest contiene 36 materias obligatorias con correlativas verificadas;
+[procedencia y cobertura](../data/sources/corre.md). Las electivas no
+especificadas quedan fuera de esa cobertura. Publicar este cambio del control no
+autoriza crear repos: refrescar el preview y aprobar por separado la cantidad y
+visibilidad (públicos por defecto). Solo después de esa autorización:
 
 ```sh
 uv run scripts/sync_repos.py manifest sync isi --plan 2023
 uv run scripts/sync_repos.py manifest sync isi --plan 2023 --apply
-uv run scripts/sync_repos.py readmes isi --plan 2023 --apply
+uv run scripts/sync_repos.py
+uv run scripts/sync_repos.py
+uv run scripts/sync_repos.py manifest diff isi --plan 2023
 ```
 
-El plan 2008 se conserva. La auditoría programada compara únicamente el plan
-publicado 2008 hasta que se decida incorporar el 2023.
+La primera línea es preview; `--apply` crea repos e instala bootstrap. El
+comando sin argumentos publica bootstrap y READMEs en todas las materias
+existentes declaradas; su repetición debe dar cero escrituras. Verificar repos,
+READMEs, bootstrap y CI reales. No usar `--archive`; conservar el plan 2008 y
+las personalizaciones de `.gitignore`. La creación no agrega clones locales.
+
+La auditoría programada compara únicamente el plan publicado 2008. Incorporar
+2023 mediante un cambio de workflow revisado solo cuando sus repos existan. El
+workflow existente regenera inventario y perfil desde sus fuentes; comprobar
+ambos tras la creación. No duplicar apuntes 2008 ni inferir mapeos OneDrive
+2023\.
 
 ### Contenido de estudio
 
