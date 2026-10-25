@@ -7,7 +7,7 @@
 # Fuentes (ver data/sources/):
 #   - dc2008.pdf  — Ordenanza Nº 1150/07, Plan 2008.
 #   - dcisi.pdf   — Ordenanza Nº 1877/22, Plan 2023.
-#   - corre.pdf   — DAG de correlatividades específico de FRRE (pendiente).
+#   - corre.pdf   — Ordenanza Nº 1878/22, correlatividades del Plan 2023.
 #
 # Convenciones:
 #   - Slugs en kebab-case, ASCII, todo minúsculas.
@@ -541,19 +541,22 @@ nivel-5 = { hs-semanales = 14 }
 # ============================================================================
 
 [planes.2023]
-correlativas-estado = "pendientes"
+correlativas-estado = "completas"
+correlativas-fuente = "data/sources/corre.pdf"
 nombre = "Plan 2023"
 ordenanza = 1877
 ordenanza-anio = 2022
 vigencia-desde = 2023
 estado = "transicion"
 practica-supervisada-hs = 200
+practica-supervisada-requisitos = "Para iniciar y acreditar la PPS se requieren las condiciones académicas de inscripción a Proyecto Final."
 duracion-hs-totales = 3992
 fuente = "data/sources/dcisi.pdf"
 
-# Correlativas: pendientes de definición FRRE (ver data/sources/corre.pdf
-# cuando esté disponible). Las Facultades Regionales tienen atribución para
-# definir el régimen mientras se respete el plan.
+# Correlativas de las 36 obligatorias: Anexo I, Ord. 1878/2022, páginas 3–5.
+# Las columnas cursadas/aprobadas rigen para cursar y rendir, salvo Proyecto Final.
+# Electivas no especificadas quedan fuera de esta cobertura. Procedencia:
+# data/sources/corre.md. No trasladar correlativas ni apuntes del Plan 2008.
 
 # -------- Primer Nivel --------
 
@@ -567,6 +570,10 @@ rtf = 10
 area = "Matemática"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.algebra-y-geometria-analitica]
 orden = 2
@@ -578,6 +585,10 @@ rtf = 10
 area = "Matemática"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.fisica-i]
 orden = 3
@@ -589,6 +600,10 @@ rtf = 10
 area = "Física"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.ingles-i]
 orden = 4
@@ -600,6 +615,10 @@ rtf = 3
 area = "Idiomas"
 bloque = "Ciencias y Tecnologías Complementarias"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.logica-y-estructuras-discretas]
 orden = 5
@@ -611,6 +630,10 @@ rtf = 6
 area = "Matemática"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.algoritmos-y-estructuras-de-datos]
 orden = 6
@@ -622,6 +645,10 @@ rtf = 10
 area = "Desarrollo de Software"
 bloque = "Tecnologías Básicas"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.arquitectura-de-computadoras]
 orden = 7
@@ -633,6 +660,10 @@ rtf = 6
 area = "Computación y Comunicación de Datos"
 bloque = "Tecnologías Básicas"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.sistemas-y-procesos-de-negocio]
 orden = 8
@@ -644,6 +675,10 @@ rtf = 5
 area = "Sistemas de Información"
 bloque = "Ciencias y Tecnologías Complementarias"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 # -------- Segundo Nivel --------
 
@@ -657,6 +692,10 @@ rtf = 10
 area = "Matemática"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.fisica-ii]
 orden = 10
@@ -668,6 +707,10 @@ rtf = 10
 area = "Física"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-i", "fisica-i"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["analisis-matematico-i", "fisica-i"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.ingenieria-y-sociedad]
 orden = 11
@@ -679,6 +722,10 @@ rtf = 3
 area = "Ciencias Sociales"
 bloque = "Ciencias y Tecnologías Complementarias"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.ingles-ii]
 orden = 12
@@ -690,6 +737,10 @@ rtf = 3
 area = "Idiomas"
 bloque = "Ciencias y Tecnologías Complementarias"
 integradora = false
+correlativas-cursar-cursadas = ["ingles-i"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["ingles-i"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.sintaxis-y-semantica-de-los-lenguajes]
 orden = 13
@@ -701,6 +752,10 @@ rtf = 8
 area = "Desarrollo de Software"
 bloque = "Tecnologías Básicas"
 integradora = false
+correlativas-cursar-cursadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.paradigmas-de-programacion]
 orden = 14
@@ -712,6 +767,10 @@ rtf = 8
 area = "Desarrollo de Software"
 bloque = "Tecnologías Básicas"
 integradora = false
+correlativas-cursar-cursadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.sistemas-operativos]
 orden = 15
@@ -723,6 +782,10 @@ rtf = 8
 area = "Computación y Comunicación de Datos"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["arquitectura-de-computadoras"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["arquitectura-de-computadoras"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.analisis-de-sistemas-de-informacion]
 orden = 16
@@ -734,6 +797,10 @@ rtf = 10
 area = "Sistemas de Información"
 bloque = "Tecnologías Aplicadas"
 integradora = true
+correlativas-cursar-cursadas = ["algoritmos-y-estructuras-de-datos", "sistemas-y-procesos-de-negocio"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["algoritmos-y-estructuras-de-datos", "sistemas-y-procesos-de-negocio"]
+correlativas-rendir-aprobadas = []
 
 # -------- Tercer Nivel --------
 
@@ -747,6 +814,10 @@ rtf = 6
 area = "Matemática"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.economia]
 orden = 18
@@ -758,6 +829,10 @@ rtf = 6
 area = "Ciencias Sociales"
 bloque = "Ciencias y Tecnologías Complementarias"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
 
 [planes.2023.materias.bases-de-datos]
 orden = 19
@@ -769,6 +844,10 @@ rtf = 8
 area = "Desarrollo de Software"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["sintaxis-y-semantica-de-los-lenguajes", "analisis-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
+correlativas-rendir-cursadas = ["sintaxis-y-semantica-de-los-lenguajes", "analisis-de-sistemas-de-informacion"]
+correlativas-rendir-aprobadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
 
 [planes.2023.materias.desarrollo-de-software]
 orden = 20
@@ -780,6 +859,10 @@ rtf = 8
 area = "Desarrollo de Software"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["paradigmas-de-programacion", "analisis-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
+correlativas-rendir-cursadas = ["paradigmas-de-programacion", "analisis-de-sistemas-de-informacion"]
+correlativas-rendir-aprobadas = ["logica-y-estructuras-discretas", "algoritmos-y-estructuras-de-datos"]
 
 [planes.2023.materias.comunicacion-de-datos]
 orden = 21
@@ -791,6 +874,10 @@ rtf = 8
 area = "Computación y Comunicación de Datos"
 bloque = "Tecnologías Básicas"
 integradora = false
+correlativas-cursar-cursadas = []
+correlativas-cursar-aprobadas = ["fisica-i", "arquitectura-de-computadoras"]
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = ["fisica-i", "arquitectura-de-computadoras"]
 
 [planes.2023.materias.analisis-numerico]
 orden = 22
@@ -802,6 +889,10 @@ rtf = 6
 area = "Matemática"
 bloque = "Ciencias Básicas de la Ingeniería"
 integradora = false
+correlativas-cursar-cursadas = ["analisis-matematico-ii"]
+correlativas-cursar-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
+correlativas-rendir-cursadas = ["analisis-matematico-ii"]
+correlativas-rendir-aprobadas = ["analisis-matematico-i", "algebra-y-geometria-analitica"]
 
 [planes.2023.materias.diseno-de-sistemas-de-informacion]
 orden = 23
@@ -813,6 +904,10 @@ rtf = 10
 area = "Sistemas de Información"
 bloque = "Tecnologías Aplicadas"
 integradora = true
+correlativas-cursar-cursadas = ["paradigmas-de-programacion", "analisis-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["ingles-i", "algoritmos-y-estructuras-de-datos", "sistemas-y-procesos-de-negocio"]
+correlativas-rendir-cursadas = ["paradigmas-de-programacion", "analisis-de-sistemas-de-informacion"]
+correlativas-rendir-aprobadas = ["ingles-i", "algoritmos-y-estructuras-de-datos", "sistemas-y-procesos-de-negocio"]
 
 # -------- Cuarto Nivel --------
 
@@ -826,6 +921,10 @@ rtf = 3
 area = "Ciencias Sociales"
 bloque = "Ciencias y Tecnologías Complementarias"
 integradora = false
+correlativas-cursar-cursadas = ["ingenieria-y-sociedad"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["ingenieria-y-sociedad"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.ingenieria-y-calidad-de-software]
 orden = 25
@@ -837,6 +936,10 @@ rtf = 6
 area = "Desarrollo de Software"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["bases-de-datos", "desarrollo-de-software", "diseno-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["sintaxis-y-semantica-de-los-lenguajes", "paradigmas-de-programacion"]
+correlativas-rendir-cursadas = ["bases-de-datos", "desarrollo-de-software", "diseno-de-sistemas-de-informacion"]
+correlativas-rendir-aprobadas = ["sintaxis-y-semantica-de-los-lenguajes", "paradigmas-de-programacion"]
 
 [planes.2023.materias.redes-de-datos]
 orden = 26
@@ -848,6 +951,10 @@ rtf = 8
 area = "Computación y Comunicación de Datos"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["sistemas-operativos", "comunicacion-de-datos"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["sistemas-operativos", "comunicacion-de-datos"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.investigacion-operativa]
 orden = 27
@@ -859,6 +966,10 @@ rtf = 6
 area = "Sistemas Inteligentes"
 bloque = "Tecnologías Básicas"
 integradora = false
+correlativas-cursar-cursadas = ["probabilidad-y-estadistica", "analisis-numerico"]
+correlativas-cursar-aprobadas = []
+correlativas-rendir-cursadas = ["probabilidad-y-estadistica", "analisis-numerico"]
+correlativas-rendir-aprobadas = []
 
 [planes.2023.materias.simulacion]
 orden = 28
@@ -870,6 +981,10 @@ rtf = 5
 area = "Sistemas Inteligentes"
 bloque = "Tecnologías Básicas"
 integradora = false
+correlativas-cursar-cursadas = ["probabilidad-y-estadistica"]
+correlativas-cursar-aprobadas = ["analisis-matematico-ii"]
+correlativas-rendir-cursadas = ["probabilidad-y-estadistica"]
+correlativas-rendir-aprobadas = ["analisis-matematico-ii"]
 
 [planes.2023.materias.tecnologias-para-la-automatizacion]
 orden = 29
@@ -881,6 +996,10 @@ rtf = 6
 area = "Sistemas Inteligentes"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["fisica-ii", "analisis-numerico"]
+correlativas-cursar-aprobadas = ["analisis-matematico-ii"]
+correlativas-rendir-cursadas = ["fisica-ii", "analisis-numerico"]
+correlativas-rendir-aprobadas = ["analisis-matematico-ii"]
 
 [planes.2023.materias.administracion-de-sistemas-de-informacion]
 orden = 30
@@ -892,6 +1011,10 @@ rtf = 10
 area = "Sistemas de Información"
 bloque = "Tecnologías Aplicadas"
 integradora = true
+correlativas-cursar-cursadas = ["economia", "diseno-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["analisis-de-sistemas-de-informacion"]
+correlativas-rendir-cursadas = ["economia", "diseno-de-sistemas-de-informacion"]
+correlativas-rendir-aprobadas = ["analisis-de-sistemas-de-informacion"]
 
 # -------- Quinto Nivel --------
 
@@ -905,6 +1028,10 @@ rtf = 6
 area = "Sistemas Inteligentes"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["simulacion"]
+correlativas-cursar-aprobadas = ["probabilidad-y-estadistica", "analisis-numerico"]
+correlativas-rendir-cursadas = ["simulacion"]
+correlativas-rendir-aprobadas = ["probabilidad-y-estadistica", "analisis-numerico"]
 
 [planes.2023.materias.ciencia-de-datos]
 orden = 32
@@ -916,6 +1043,10 @@ rtf = 6
 area = "Sistemas Inteligentes"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["simulacion"]
+correlativas-cursar-aprobadas = ["probabilidad-y-estadistica", "bases-de-datos"]
+correlativas-rendir-cursadas = ["simulacion"]
+correlativas-rendir-aprobadas = ["probabilidad-y-estadistica", "bases-de-datos"]
 
 [planes.2023.materias.sistemas-de-gestion]
 orden = 33
@@ -927,6 +1058,10 @@ rtf = 8
 area = "Gestión Ingenieril"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["economia", "investigacion-operativa"]
+correlativas-cursar-aprobadas = ["diseno-de-sistemas-de-informacion"]
+correlativas-rendir-cursadas = ["economia", "investigacion-operativa"]
+correlativas-rendir-aprobadas = ["diseno-de-sistemas-de-informacion"]
 
 [planes.2023.materias.gestion-gerencial]
 orden = 34
@@ -938,6 +1073,10 @@ rtf = 6
 area = "Gestión Ingenieril"
 bloque = "Ciencias y Tecnologías Complementarias"
 integradora = false
+correlativas-cursar-cursadas = ["legislacion", "administracion-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["economia"]
+correlativas-rendir-cursadas = ["legislacion", "administracion-de-sistemas-de-informacion"]
+correlativas-rendir-aprobadas = ["economia"]
 
 [planes.2023.materias.seguridad-en-los-sistemas-de-informacion]
 orden = 35
@@ -949,6 +1088,10 @@ rtf = 6
 area = "Gestión Ingenieril"
 bloque = "Tecnologías Aplicadas"
 integradora = false
+correlativas-cursar-cursadas = ["redes-de-datos", "administracion-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["desarrollo-de-software", "comunicacion-de-datos"]
+correlativas-rendir-cursadas = ["redes-de-datos", "administracion-de-sistemas-de-informacion"]
+correlativas-rendir-aprobadas = ["desarrollo-de-software", "comunicacion-de-datos"]
 
 [planes.2023.materias.proyecto-final]
 orden = 36
@@ -960,6 +1103,11 @@ rtf = 13
 area = "Sistemas de Información"
 bloque = "Tecnologías Aplicadas"
 integradora = true
+correlativas-cursar-cursadas = ["ingenieria-y-calidad-de-software", "redes-de-datos", "administracion-de-sistemas-de-informacion"]
+correlativas-cursar-aprobadas = ["ingles-ii", "desarrollo-de-software", "diseno-de-sistemas-de-informacion"]
+correlativas-rendir-cursadas = []
+correlativas-rendir-aprobadas = []
+correlativas-rendir-todas = true
 
 # Electivas: definidas por la Facultad Regional.
 [planes.2023.electivas]

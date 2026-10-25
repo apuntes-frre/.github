@@ -17,10 +17,10 @@
 {% if prerequisites_pending %}
 ## 🔗 Correlativas
 
-Pendientes de definición por UTN-FRRE. La ausencia de correlativas cargadas
+Pendientes de carga y verificación documental. La ausencia de correlativas cargadas
 no significa que esta materia no tenga requisitos.
 
-{% elif cursar_cursadas or cursar_aprobadas or rendir_aprobadas or rendir_todas %}
+{% elif cursar_cursadas or cursar_aprobadas or rendir_cursadas or rendir_aprobadas or rendir_todas %}
 ## 🔗 Correlativas
 
 {% if cursar_cursadas %}
@@ -29,12 +29,23 @@ no significa que esta materia no tenga requisitos.
 {% if cursar_aprobadas %}
 **Para cursar — aprobadas:** {{ cursar_aprobadas|join(', ') }}
 {% endif %}
+{% if rendir_cursadas %}
+**Para rendir — cursadas:** {{ rendir_cursadas|join(', ') }}
+{% endif %}
 {% if rendir_aprobadas %}
 **Para rendir — aprobadas:** {{ rendir_aprobadas|join(', ') }}
 {% endif %}
 {% if rendir_todas %}
+{% if plan == "2023" %}
+**Para rendir:** tener aprobadas todas las asignaturas previas del plan de estudios.
+{% else %}
 **Para rendir:** todas las materias restantes del plan.
 {% endif %}
+{% endif %}
+{% elif prerequisites_explicit %}
+## 🔗 Correlativas
+
+Sin correlativas para cursar ni rendir.
 {% endif %}
 
 ## 📂 Estructura

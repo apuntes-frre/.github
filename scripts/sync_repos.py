@@ -37,12 +37,12 @@ from rich.table import Table  # ty: ignore
 
 if __package__:
     from .common import (
-        DEFAULT_PLAN, ORG_NAME, ROOT, get_plan, load_manifest,
+        DEFAULT_PLAN, ORG_NAME, PREREQUISITE_KEYS, ROOT, get_plan, load_manifest,
         load_manifests, parse_repo_name, template_environment,
     )
 else:
     from common import (
-        DEFAULT_PLAN, ORG_NAME, ROOT, get_plan, load_manifest,
+        DEFAULT_PLAN, ORG_NAME, PREREQUISITE_KEYS, ROOT, get_plan, load_manifest,
         load_manifests, parse_repo_name, template_environment,
     )
 
@@ -126,7 +126,7 @@ def _plan_data(manifest: dict[str, Any], plan: str) -> dict[str, Any]:
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
     if data.get("correlativas-estado") == "pendientes":
-        console.print(f"[yellow]⚠ Plan {plan}: correlativas pendientes de definición FRRE.[/]")
+        console.print(f"[yellow]⚠ Plan {plan}: correlativas pendientes de carga y verificación documental.[/]")
     return data
 
 
@@ -336,8 +336,10 @@ def _render_subject_readme(
         integradora=materia.get("integradora", False),
         cursar_cursadas=resolve(materia.get("correlativas-cursar-cursadas", [])),
         cursar_aprobadas=resolve(materia.get("correlativas-cursar-aprobadas", [])),
+        rendir_cursadas=resolve(materia.get("correlativas-rendir-cursadas", [])),
         rendir_aprobadas=resolve(materia.get("correlativas-rendir-aprobadas", [])),
         rendir_todas=materia.get("correlativas-rendir-todas", False),
+        prerequisites_explicit=all(field in materia for field in PREREQUISITE_KEYS),
     )
 
 
