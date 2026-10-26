@@ -37,7 +37,7 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 - 📁 [`isi-2008-diseno-de-sistemas`](https://github.com/apuntes-frre/isi-2008-diseno-de-sistemas) — **Diseño de Sistemas**
 - 📁 [`isi-2008-economia`](https://github.com/apuntes-frre/isi-2008-economia) — **Economía**
 - 📁 [`isi-2008-fisica-i`](https://github.com/apuntes-frre/isi-2008-fisica-i) — **Física I**
-- 📁 [`isi-2008-fisica-ii`](https://github.com/apuntes-frre/isi-2008-fisica-ii) — **Física II** — Campo cero dos cargas puntuales, Campo electrico guia 1 2, Campo induccion magnetica informe
+- 📁 [`isi-2008-fisica-ii`](https://github.com/apuntes-frre/isi-2008-fisica-ii) — **Física II** — Examen final diciembre 10, Examen final diciembre 17, Segundo parcial sistemas a junio 2020 variante 1
 - 📁 [`isi-2008-gestion-de-datos`](https://github.com/apuntes-frre/isi-2008-gestion-de-datos) — **Gestión de Datos** — Unidad i comprension y fijacion, Unidad i cuestionario grupo 4 borrador, Unidad i cuestionario grupo 4
 - 📁 [`isi-2008-ingenieria-de-software`](https://github.com/apuntes-frre/isi-2008-ingenieria-de-software) — **Ingeniería de Software**
 - 📁 [`isi-2008-ingenieria-y-sociedad`](https://github.com/apuntes-frre/isi-2008-ingenieria-y-sociedad) — **Ingeniería y Sociedad**
@@ -65,14 +65,14 @@ Espacio colaborativo para compartir y mantener material de estudio actualizado.
 
 ## 🔄 Actualizaciones recientes
 
-- `2026-10-21` · **isi-2008-fisica-ii** — Merge pull request #1 from apuntes-frre/codex/transcribir-fisica-ii
+- `2026-10-26` · **isi-2008-fisica-ii** — Merge pull request #5 from apuntes-frre/codex/corregir-fidelidad-procedencia-fisica-ii
 - `2026-10-17` · **isi-2008-analisis-matematico-ii** — Merge pull request #7 from apuntes-frre/codex/estandarizar-nombres
 - `2026-10-17` · **isi-2008-gestion-de-datos** — Merge pull request #1 from apuntes-frre/codex/gestion-datos-transcription-pilot
 
 ---
 
 <sub>
-🗓 Última actualización: 2026-10-21 ·
+🗓 Última actualización: 2026-10-26 ·
 📚 35 materias ·
 🎓 1 carrera ·
 📆 1 plan
