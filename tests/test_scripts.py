@@ -11,6 +11,7 @@ from types import SimpleNamespace
 import hashlib
 import json
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -665,42 +666,20 @@ class WorkflowTests(unittest.TestCase):
                             )
                             self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_repeated_link_reports_update_one_issue(self):
+    def test_link_check_is_offline_read_only_and_not_scheduled(self):
         workflow = yaml.safe_load(
             (common.ROOT / ".github" / "workflows" / "link-check.yml").read_text()
         )
-        step = next(
-            s
-            for s in workflow["jobs"]["lychee"]["steps"]
-            if s.get("name") == "Update recurring issue on scheduled failure"
-        )
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / "lychee").mkdir()
-            (root / "lychee" / "out.md").write_text("Broken link report")
-            gh = root / "gh"
-            gh.write_text("""#!/bin/bash
-case "$2" in
-  list) if [ -f issue ]; then echo 42; fi ;;
-  create) touch issue; echo create >> calls ;;
-  edit) echo edit >> calls ;;
-  *) exit 2 ;;
-esac
-""")
-            gh.chmod(0o755)
-            env = dict(os.environ, PATH=f"{root}{os.pathsep}{os.environ['PATH']}")
-            for _ in range(2):
-                result = subprocess.run(
-                    ["bash", "-e", "-o", "pipefail", "-c", step["run"]],
-                    cwd=root,
-                    env=env,
-                    capture_output=True,
-                    text=True,
-                )
-                self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(
-                (root / "calls").read_text().splitlines(), ["create", "edit"]
-            )
+        triggers = workflow.get("on", workflow.get(True, {}))
+        self.assertNotIn("schedule", triggers)
+        self.assertEqual(workflow["permissions"], {"contents": "read"})
+        steps = workflow["jobs"]["lychee"]["steps"]
+        check = next(s for s in steps if s.get("uses", "").startswith("lycheeverse/"))
+        args = shlex.split(check["with"]["args"])
+        self.assertIn("--offline", args)
+        self.assertNotIn("--insecure", args)
+        self.assertTrue(check["with"]["fail"])
+        self.assertFalse(any("run" in step for step in steps))
 
 
 if __name__ == "__main__":

@@ -45,7 +45,7 @@ Las regresiones se verifican con `uv run tests/test_scripts.py`.
 | Workflow | Triggers |
 | -------- | -------- |
 | `check.yml` — Check Scripts | pull_request, push |
-| `link-check.yml` — Link Check | schedule, workflow_dispatch, pull_request |
+| `link-check.yml` — Link Check | workflow_dispatch, pull_request |
 | `repo-readme.yml` — Update READMEs | push, schedule, workflow_dispatch, repository_dispatch |
 | `repo-sync.yml` — Repository Audit | schedule, workflow_dispatch |
 
