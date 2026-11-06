@@ -138,7 +138,7 @@ El orden es estable y la fecha cambia con la actividad de contenido.
 | `check.yml` | PR y push a main de scripts, tests, manifests, templates o workflows | Regresiones sin llamadas a GitHub y validación de workflows. |
 | `repo-readme.yml` | Cambios de fuentes en main, semanal, dispatch y `subject-repo-updated` | Regenera perfil e inventario; publica ambos en un solo commit cuando hay diferencias. |
 | `repo-sync.yml` | Mensual y dispatch | Valida todos los planes y compara el plan publicado 2008 con GitHub. Solo lectura, sin clones. |
-| `link-check.yml` | PR de Markdown, semanal y dispatch | Falla ante enlaces rotos; en ejecuciones programadas crea o actualiza un único issue abierto. |
+| `link-check.yml` | PR de Markdown y dispatch | Valida referencias locales sin red. No consulta URLs externas ni crea issues. |
 | `dependabot.yml` | Semanal | Propone actualizaciones agrupadas de GitHub Actions. |
 
 Un solo workflow publica los dos READMEs y serializa sus ejecuciones por ref.
@@ -146,9 +146,12 @@ Antes de hacer push incorpora los cambios recientes de main con rebase;
 si hay conflicto, falla para revisión. Un dispatch desde otra rama no hace push.
 
 El token de CI tiene `contents: read` en auditoría y checks; el generador
-necesita `contents: write` en el control. El chequeo de enlaces necesita
-`issues: write` para reportes programados. Las operaciones manuales sobre
-repos de materia usan la sesión local de `gh`, con escritura y permiso para
+necesita `contents: write` en el control. El chequeo de enlaces usa
+solo `contents: read`, no tiene ejecución periódica ni publica reportes como
+issues. Las URLs de fuentes externas se conservan como referencias, pero su
+disponibilidad y configuración TLS no condicionan la validación del repositorio.
+Las operaciones manuales sobre repos de materia usan la sesión local de `gh`,
+con escritura y permiso para
 publicar workflows. No se almacena ningún token en archivos del repositorio ni
 se requiere un PAT de Actions. La auditoría de solo lectura mantiene el token
 integrado de GitHub. La creación por el script instala las instrucciones
